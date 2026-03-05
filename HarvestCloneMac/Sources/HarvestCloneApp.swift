@@ -8,7 +8,7 @@ struct HarvestCloneApp: App {
         MenuBarExtra("Harvest Clone", systemImage: "clock") {
             ContentView()
                 .environmentObject(store)
-                .frame(width: 600, height: 600)
+                .frame(width: 800, height: 600)
         }
         .menuBarExtraStyle(.window)
     }

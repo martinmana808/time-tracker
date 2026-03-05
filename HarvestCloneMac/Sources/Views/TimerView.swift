@@ -28,7 +28,7 @@ struct TimerView: View {
                             Text(project.name).tag(UUID?(project.id))
                         }
                     }
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: 200)
                     .disabled(store.activeTimer != nil)
                     
                     Text(timeString(from: elapsedSeconds))
