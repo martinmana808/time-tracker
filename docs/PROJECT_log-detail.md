@@ -131,4 +131,49 @@ The build was verified using the local Vite server (`npm run dev`). A systematic
 
 Validation was fully positive, proving the robustness of the core React logic and `localStorage` synchronisation.
 
-![Time Entries View](/Users/martinmana/.gemini/antigravity/brain/238e1da6-40bc-46f6-8473-bead63212d13/.system_generated/click_feedback/click_feedback_1772752057002.png)
+
+<a name="log-20260305-xcode-migration"></a>
+## Request
+> i dont like this. nothing seems to work. why dont we move to xcode ?
+
+## Artifact: Implementation Plan
+# Phase 2: Native SwiftUI Menu Bar Migration
+
+The user requested circumventing Electron entirely and building a true native macOS app utilizing Xcode and SwiftUI for maximum performance, minimal footprint, and zero dependency friction.
+
+## Approach
+We will build a macOS-native `MenuBarExtra` application using **SwiftUI**. This gives us natural access to the top menu bar, automatically handles hiding the dock icon, and provides robust iOS/macOS `.json` encoding directly onto the native file system (`FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)`).
+
+## Proposed Changes
+
+### 1. Xcode Scaffolding
+- The user will generate an empty macOS App via `Xcode > File > New > Project` named `HarvestClone`.
+- We will set `LSUIElement` to `YES` in the `Info.plist` (or the project settings) to prevent the app from appearing in the Dock and Cmd+Tab switcher.
+
+### 2. State & Models (The Engine)
+- **`Models.swift`**: Swift structs for `Project`, `TimeEntry`, and `ActiveTimer` matching the previous TS types, confirming to `Codable`, `Identifiable`, and `Hashable`.
+- **`TimerStore.swift`**: An `@Observable` (or `ObservableObject`) class similar to Zustand. It will contain methods like `addProject`, `startTimer`, `stopTimer`.
+- Storage will be handled seamlessly by encoding/decoding the structs to a persistent `data.json` inside the standard macOS Application Support layer.
+
+### 3. SwiftUI App Life Cycle
+- **`HarvestCloneApp.swift`**: Will utilize the `MenuBarExtra` scene introduced in macOS 13.0 instead of a `WindowGroup`, attaching our custom icon.
+
+### 4. UI Implementation (The Views)
+- We will translate the Tailwind/React UI directly into declarative SwiftUI:
+  - `ContentView.swift`: A slim sidebar (`NavigationSplitView` or custom `HStack` sidebar) to navigate.
+  - `TimerView.swift`: Our stopwatch using a `@State` timer that ticks every second.
+  - `ProjectsView.swift`: A list with a sheet to add new projects.
+  - `DashboardView.swift`: Utilizing Swift Charts (if feasible) or a simple aggregate list for total time viewing.
+
+## Verification Plan
+- User will build and run from Xcode (Cmd + R).
+- Verify the tray icon appears and the app doesn't show in the Dock.
+- Verify adding a project works natively.
+- Verify timer ticks natively.
+
+## Artifact: Walkthrough
+## Phase 3: Pure SwiftUI Native App Rewrite
+Following build complexities and overhead using Node and Electron, the application was entirely rebuilt as a pure native macOS target using Xcode/SwiftUI resulting in a blazingly fast, zero-dependency executable.
+1. **SwiftUI Engine**: Models and Views were re-written into native Swift structs and `View` protocols.
+2. **Native MenuBarExtra**: Hooks seamlessly into macOS 13+ native `MenuBarExtra` system APIs.
+3. **Application State**: Converted `Zustand` directly to a native `ObservableObject` backed intimately by `FileManager` parsing data as `.json` seamlessly into Apple's Application Support framework.

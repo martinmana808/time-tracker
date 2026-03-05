@@ -1,11 +1,16 @@
 # Harvest Clone Timer
 ## Tech Stack
-React, Vite, TypeScript, Tailwind CSS, Zustand, Lucide React
+Native macOS Application: Swift, SwiftUI, XcodeGen
 
 ## Project Summary
-A local-first stopwatch and timer application cloning Harvest functionality. Users can create projects, track time against them, and view a dashboard of their tracked time.
+A local-first stopwatch and timer application cloning Harvest functionality. Re-built natively for macOS to run silently in the Menu Bar using deep system integrations without Electron overhead.
 
 ## History
+
+### [2026-03-05] Pure SwiftUI Full Native Rewrite | [Technical Details](./PROJECT_log-detail.md#log-20260305-xcode-migration)
+- Circumvented Node/Electron bundle issues by transitioning entirely to native Swift rendering.
+- Set up automated `xcodegen` schema for deterministic project generation.
+- Re-created persistent storage natively via `ObservableObject` and system-level `FileManager` serialization.
 
 ### [2026-03-05] Native App Migration | [Technical Details](./PROJECT_log-detail.md#log-20260305-electron-migration)
 - Successfully migrated application into an Electron un-docked Menu Bar application.

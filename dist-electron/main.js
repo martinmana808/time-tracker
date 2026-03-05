@@ -1,1 +1,93 @@
-"use strict";const t=require("electron"),i=require("path"),s=require("fs");let l=null,e=null;const h=process.env.NODE_ENV==="development",p=()=>{const r=t.nativeImage.createFromPath(i.join(__dirname,"../public/vite.svg")).resize({width:16,height:16});l=new t.Tray(r),l.setToolTip("Harvest Clone"),l.on("click",(n,o)=>{w(o)})},c=()=>{e=new t.BrowserWindow({width:380,height:600,show:!1,frame:!1,fullscreenable:!1,resizable:!1,transparent:!0,webPreferences:{preload:i.join(__dirname,"preload.js"),nodeIntegration:!1,contextIsolation:!0}}),h?e.loadURL("http://localhost:5173"):e.loadFile(i.join(__dirname,"../dist/index.html")),e.on("blur",()=>{e?.webContents.isDevToolsOpened()||e?.hide()})},w=r=>{if(e)if(e.isVisible())e.hide();else{const n=e.getBounds(),o=Math.round(r.x+r.width/2-n.width/2),a=Math.round(r.y+r.height);e.setPosition(o,a,!1),e.show(),e.focus()}},u=()=>{const r=t.app.getPath("userData"),n=i.join(r,"harvest-clone-data.json");t.ipcMain.handle("read-store",()=>{try{if(s.existsSync(n))return s.readFileSync(n,"utf-8")}catch(o){console.error("Error reading store:",o)}return null}),t.ipcMain.handle("write-store",(o,a)=>{try{return s.writeFileSync(n,a,"utf-8"),!0}catch(d){return console.error("Error writing store:",d),!1}})};t.app.whenReady().then(()=>{t.app.dock&&t.app.dock.hide(),u(),c(),p(),t.app.on("activate",()=>{t.BrowserWindow.getAllWindows().length===0&&c()})});t.app.on("window-all-closed",()=>{process.platform!=="darwin"&&t.app.quit()});
+"use strict";
+const electron = require("electron");
+const path = require("path");
+const fs = require("fs");
+let tray = null;
+let window = null;
+const isDev = process.env.NODE_ENV === "development";
+const createTray = () => {
+  const icon = electron.nativeImage.createFromPath(path.join(__dirname, "../public/vite.svg")).resize({ width: 16, height: 16 });
+  tray = new electron.Tray(icon);
+  tray.setToolTip("Harvest Clone");
+  tray.on("click", (event, bounds) => {
+    toggleWindow(bounds);
+  });
+};
+const createWindow = () => {
+  window = new electron.BrowserWindow({
+    width: 380,
+    height: 600,
+    show: false,
+    frame: false,
+    fullscreenable: false,
+    resizable: false,
+    transparent: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+  if (isDev) {
+    window.loadURL("http://localhost:5173");
+  } else {
+    window.loadFile(path.join(__dirname, "../dist/index.html"));
+  }
+  window.on("blur", () => {
+    if (!window?.webContents.isDevToolsOpened()) {
+      window?.hide();
+    }
+  });
+};
+const toggleWindow = (bounds) => {
+  if (!window) return;
+  if (window.isVisible()) {
+    window.hide();
+  } else {
+    const windowBounds = window.getBounds();
+    const x = Math.round(bounds.x + bounds.width / 2 - windowBounds.width / 2);
+    const y = Math.round(bounds.y + bounds.height);
+    window.setPosition(x, y, false);
+    window.show();
+    window.focus();
+  }
+};
+const setupDataStore = () => {
+  const userDataPath = electron.app.getPath("userData");
+  const dataPath = path.join(userDataPath, "harvest-clone-data.json");
+  electron.ipcMain.handle("read-store", () => {
+    try {
+      if (fs.existsSync(dataPath)) {
+        return fs.readFileSync(dataPath, "utf-8");
+      }
+    } catch (err) {
+      console.error("Error reading store:", err);
+    }
+    return null;
+  });
+  electron.ipcMain.handle("write-store", (_, data) => {
+    try {
+      fs.writeFileSync(dataPath, data, "utf-8");
+      return true;
+    } catch (err) {
+      console.error("Error writing store:", err);
+      return false;
+    }
+  });
+};
+electron.app.whenReady().then(() => {
+  if (electron.app.dock) {
+    electron.app.dock.hide();
+  }
+  setupDataStore();
+  createWindow();
+  createTray();
+  electron.app.on("activate", () => {
+    if (electron.BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
+});
+electron.app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    electron.app.quit();
+  }
+});

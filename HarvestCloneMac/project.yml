@@ -1,0 +1,20 @@
+name: HarvestClone
+options:
+  bundleIdPrefix: com.harvestclone.mac
+targets:
+  HarvestClone:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: Sources
+    info:
+      path: Sources/Info.plist
+      properties:
+        LSUIElement: true
+        CFBundleIdentifier: com.harvestclone.mac.HarvestClone
+        CFBundleShortVersionString: 1.0.0
+        CFBundleVersion: "1"
+        CFBundleName: HarvestClone
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)

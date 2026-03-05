@@ -1,0 +1,312 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3625D2B996AF98F7AB49455D /* TimerStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE268461B0D72DD86778C483 /* TimerStore.swift */; };
+		512D28B2DC8361FABB2B94B4 /* HarvestCloneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD6EFB28E27F48C66F26C50 /* HarvestCloneApp.swift */; };
+		799FACB7A9427DEB256C2025 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807BFAD99F6BAC168DF9776D /* ContentView.swift */; };
+		83549E2E05A461D0BB91B7A5 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513B5E4348C71C95E33056D0 /* TimerView.swift */; };
+		B080FE6F830AF3A75EBBFEA7 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 740CD7E03DC6E471FD4D3479 /* Models.swift */; };
+		C92C1BCC27F0C315700C5EFA /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD182AD829199FF6C45B169 /* ProjectsView.swift */; };
+		D1D9562FD51A215AE792E6E6 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		513B5E4348C71C95E33056D0 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
+		6F4014D2BD8BDE14943E42A4 /* HarvestClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HarvestClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		740CD7E03DC6E471FD4D3479 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		807BFAD99F6BAC168DF9776D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		8AD182AD829199FF6C45B169 /* ProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsView.swift; sourceTree = "<group>"; };
+		A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		ADD6EFB28E27F48C66F26C50 /* HarvestCloneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarvestCloneApp.swift; sourceTree = "<group>"; };
+		CE268461B0D72DD86778C483 /* TimerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerStore.swift; sourceTree = "<group>"; };
+		E9F501D431E394B1AB465EE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1DB495234C1CD08395A93E73 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				6F4014D2BD8BDE14943E42A4 /* HarvestClone.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		86C353F5C1517E5F429F015B /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				ADD6EFB28E27F48C66F26C50 /* HarvestCloneApp.swift */,
+				E9F501D431E394B1AB465EE2 /* Info.plist */,
+				740CD7E03DC6E471FD4D3479 /* Models.swift */,
+				CE268461B0D72DD86778C483 /* TimerStore.swift */,
+				A0E4CD1F642DE5F505F88BC5 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A006DD1F2431A32554C50589 = {
+			isa = PBXGroup;
+			children = (
+				86C353F5C1517E5F429F015B /* Sources */,
+				1DB495234C1CD08395A93E73 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A0E4CD1F642DE5F505F88BC5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				807BFAD99F6BAC168DF9776D /* ContentView.swift */,
+				A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */,
+				8AD182AD829199FF6C45B169 /* ProjectsView.swift */,
+				513B5E4348C71C95E33056D0 /* TimerView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3311B93BE89628CB0B6DC4D5 /* HarvestClone */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2A397C37CBA27CA74C8E651 /* Build configuration list for PBXNativeTarget "HarvestClone" */;
+			buildPhases = (
+				7C3AFA2A611DD8F80CFEDDF3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = HarvestClone;
+			packageProductDependencies = (
+			);
+			productName = HarvestClone;
+			productReference = 6F4014D2BD8BDE14943E42A4 /* HarvestClone.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D93A6832896A687732AF4E1C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = CC55137D8995AA9D3EEFE5AF /* Build configuration list for PBXProject "HarvestClone" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = A006DD1F2431A32554C50589;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1DB495234C1CD08395A93E73 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3311B93BE89628CB0B6DC4D5 /* HarvestClone */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7C3AFA2A611DD8F80CFEDDF3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				799FACB7A9427DEB256C2025 /* ContentView.swift in Sources */,
+				D1D9562FD51A215AE792E6E6 /* DashboardView.swift in Sources */,
+				512D28B2DC8361FABB2B94B4 /* HarvestCloneApp.swift in Sources */,
+				B080FE6F830AF3A75EBBFEA7 /* Models.swift in Sources */,
+				C92C1BCC27F0C315700C5EFA /* ProjectsView.swift in Sources */,
+				3625D2B996AF98F7AB49455D /* TimerStore.swift in Sources */,
+				83549E2E05A461D0BB91B7A5 /* TimerView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		96868BA2C963B0CE85CDCF6B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.harvestclone.mac.HarvestClone;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		BC44458F50EDB28CE6605656 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		E3945F4C77AEBCA655B12EB4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		E4E310A4826A47A37A2DEBA9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = Sources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.harvestclone.mac.HarvestClone;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C2A397C37CBA27CA74C8E651 /* Build configuration list for PBXNativeTarget "HarvestClone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				96868BA2C963B0CE85CDCF6B /* Debug */,
+				E4E310A4826A47A37A2DEBA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CC55137D8995AA9D3EEFE5AF /* Build configuration list for PBXProject "HarvestClone" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC44458F50EDB28CE6605656 /* Debug */,
+				E3945F4C77AEBCA655B12EB4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D93A6832896A687732AF4E1C /* Project object */;
+}

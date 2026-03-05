@@ -1,0 +1,83 @@
+import Foundation
+import Combine
+
+class TimerStore: ObservableObject {
+    @Published var projects: [Project] = []
+    @Published var timeEntries: [TimeEntry] = []
+    @Published var activeTimer: ActiveTimer? = nil
+    
+    private let fileManager = FileManager.default
+    private var dataURL: URL {
+        let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+        let appDir = appSupportURL.appendingPathComponent("HarvestClone")
+        
+        if !fileManager.fileExists(atPath: appDir.path) {
+            try? fileManager.createDirectory(at: appDir, withIntermediateDirectories: true)
+        }
+        
+        return appDir.appendingPathComponent("data.json")
+    }
+    
+    init() {
+        loadData()
+    }
+    
+    func addProject(name: String, color: String) {
+        let project = Project(name: name, color: color)
+        projects.append(project)
+        saveData()
+    }
+    
+    func deleteProject(id: UUID) {
+        projects.removeAll { $0.id == id }
+        saveData()
+    }
+    
+    func startTimer(projectId: UUID, description: String) {
+        activeTimer = ActiveTimer(projectId: projectId, description: description, startTime: Date())
+        saveData()
+    }
+    
+    func stopTimer() {
+        guard let timer = activeTimer else { return }
+        
+        let entry = TimeEntry(projectId: timer.projectId, description: timer.description, startTime: timer.startTime, endTime: Date())
+        timeEntries.insert(entry, at: 0)
+        activeTimer = nil
+        saveData()
+    }
+    
+    func addTimeEntry(entry: TimeEntry) {
+        timeEntries.insert(entry, at: 0)
+        saveData()
+    }
+    
+    func getProject(id: UUID) -> Project? {
+        return projects.first { $0.id == id }
+    }
+    
+    // MARK: - Persistence
+    
+    struct StoredData: Codable {
+        var projects: [Project]
+        var timeEntries: [TimeEntry]
+        var activeTimer: ActiveTimer?
+    }
+    
+    private func saveData() {
+        let data = StoredData(projects: projects, timeEntries: timeEntries, activeTimer: activeTimer)
+        if let encoded = try? JSONEncoder().encode(data) {
+            try? encoded.write(to: dataURL)
+        }
+    }
+    
+    private func loadData() {
+        if let data = try? Data(contentsOf: dataURL) {
+            if let decoded = try? JSONDecoder().decode(StoredData.self, from: data) {
+                self.projects = decoded.projects
+                self.timeEntries = decoded.timeEntries
+                self.activeTimer = decoded.activeTimer
+            }
+        }
+    }
+}
