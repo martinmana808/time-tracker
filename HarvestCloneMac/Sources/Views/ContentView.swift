@@ -43,7 +43,7 @@ struct ContentView: View {
                 .padding()
                 .foregroundColor(.secondary)
             }
-            .frame(width: 140)
+            .frame(width: 180)
             .background(Color(NSColor.windowBackgroundColor))
             
             Divider()
