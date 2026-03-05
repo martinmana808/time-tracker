@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu, nativeImage, ipcMain, screen } from 'electron';
+import { app, BrowserWindow, Tray, ipcMain, nativeImage } from 'electron';
 import path from 'path';
 import fs from 'fs';
 
