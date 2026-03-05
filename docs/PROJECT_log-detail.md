@@ -1,6 +1,51 @@
 # Forensic Ledger
 *(Detailed artifacts and user requests will be logged here)*
 
+<a name="log-20260305-electron-migration"></a>
+## Request
+> could we turn this into a native app in the menu mac os bar? when we click it, we can open this very same design and everything, but i want it to be an app i will always use, from now onwards, and I would like it to save the data locally, but not in local storage, something more robust, can we ?
+
+## Artifact: Implementation Plan
+# Phase 2: Electron Menu Bar Migration Implementation Plan
+
+The user requested transforming the web application into a native macOS menu bar app and moving away from `localStorage` to a more robust local storage solution. 
+
+## Approach
+We will use **Electron**. It provides excellent APIs for building system tray (menu bar) applications, hiding the dock icon, positioning frameless windows precisely, and easily writing robust data to the local disk using the user's secure application data directory (`~/Library/Application Support/...`).
+
+## Proposed Changes
+
+### 1. Electron Scaffold
+- **Dependencies**: Install `electron`, `electron-builder`, and basic dev utilities to run Vite and Electron concurrently.
+- **Entry Points**: 
+  - `electron/main.ts`: The main process. Will handle the Tray icon lifecycle, creating a frameless window, and calculating coordinates to appear directly under the menu bar icon.
+  - `electron/preload.ts`: The bridge exposing robust file system APIs to the React app securely via context bridge.
+- **Config**: Tweak `vite.config.ts` to output paths correctly for Electron consumption. Update `package.json` to define "main" and run scripts (`npm run dev:electron`).
+
+### 2. The Menu Bar Experience (Tray)
+- We will use Electron's `Tray` class to add an icon to the top right of the mac screen.
+- We will set `app.dock.hide()` so the app doesn't show up in the normal macOS Dock or Cmd+Tab switcher, feeling like a true background utility.
+- When the Tray is clicked, we calculate the bounds of the icon and spawn a framed `BrowserWindow` right beneath it.
+- When the user clicks away (`window.on('blur')`), we gracefully hide the window.
+
+### 3. Robust Data Storage (Zustand Custom Persist)
+- We will replace `localStorage` with a robust Node.js file system approach. 
+- In `main.ts`, we'll listen for IPC events to save/load JSON data. We will save it to `app.getPath('userData') + '/data.json'`. This directory is immune to browser cache clearing and is persistent across app updates.
+- In `preload.ts`, we'll expose `window.api.saveData(key, value)` and `window.api.loadData(key)`.
+- We'll construct a custom `Storage` for Zustand's `persist` middleware, pointing `getItem`, `setItem`, and `removeItem` to our new IPC bridge.
+
+### 4. Build and Package
+- Configure `electron-builder` in `package.json` to easily bundle the app into a double-clickable macOS `.app` binary.
+
+## Verification Plan
+1. Start the app in dev mode (`npm run electron:dev`).
+2. Verify the app no longer opens in a browser, but instead appears as a tray icon.
+3. Click the tray icon to verify the UI opens beneath it.
+4. Click away to verify it hides.
+5. Add a project and entries.
+6. Check `~/Library/Application Support/harvest-clone-electron/data.json` to verify data is written physically to disk.
+7. Quit and relaunch to verify state is restored perfectly.
+
 <a name="log-20260305-harvest-clone-init"></a>
 ## Request
 > A timer to work on projects, like a FORECAST HARVEST clone, where I can create projects, and then start a timer/stopwatch against that project and creates a record, that i can add a description to what was done. Records add and you have a total time when you check the project with a dashboard, etc.

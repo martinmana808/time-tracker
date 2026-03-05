@@ -22,6 +22,30 @@ interface TimerState {
   deleteTimeEntry: (id: string) => void;
 }
 
+const customStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    if (typeof window !== 'undefined' && 'electronAPI' in window) {
+      const saved = await (window as unknown as { electronAPI: { readStore: () => Promise<string | null> } }).electronAPI.readStore();
+      if (saved) return saved;
+    }
+    return localStorage.getItem(name);
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    if (typeof window !== 'undefined' && 'electronAPI' in window) {
+      await (window as unknown as { electronAPI: { writeStore: (v: string) => Promise<boolean> } }).electronAPI.writeStore(value);
+    } else {
+      localStorage.setItem(name, value);
+    }
+  },
+  removeItem: async (name: string): Promise<void> => {
+    if (typeof window !== 'undefined' && 'electronAPI' in window) {
+      await (window as unknown as { electronAPI: { writeStore: (v: string) => Promise<boolean> } }).electronAPI.writeStore('{}');
+    } else {
+      localStorage.removeItem(name);
+    }
+  },
+};
+
 export const useTimerStore = create<TimerState>()(
   persist(
     (set) => ({
@@ -82,6 +106,7 @@ export const useTimerStore = create<TimerState>()(
     }),
     {
       name: 'harvest-clone-storage',
+      storage: customStorage as any,
     }
   )
 );
