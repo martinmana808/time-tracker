@@ -7,6 +7,7 @@ class TimerStore: ObservableObject {
     @Published var activeTimer: ActiveTimer? = nil
     @Published var headerTitle: String = "Harvest Clone"
     @Published var isTimerRunning: Bool = false
+    @Published var activeTimeString: String = "00:00:00"
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -28,16 +29,17 @@ class TimerStore: ObservableObject {
         Timer.publish(every: 1, on: .main, in: .common)
             .autoconnect()
             .sink { [weak self] _ in
-                self?.updateHeaderTitle()
+                self?.updateTimerStrings()
             }
             .store(in: &cancellables)
     }
     
-    private func updateHeaderTitle() {
+    private func updateTimerStrings() {
         guard let timer = activeTimer else {
             if headerTitle != "Harvest Clone" {
                 headerTitle = "Harvest Clone"
                 isTimerRunning = false
+                activeTimeString = "00:00:00"
             }
             return
         }
@@ -47,9 +49,12 @@ class TimerStore: ObservableObject {
         let minutes = Int(elapsed) / 60 % 60
         let seconds = Int(elapsed) % 60
         
+        let fullTimeString = String(format: "%02i:%02i:%02i", hours, minutes, seconds)
+        activeTimeString = fullTimeString
+        
         let newTitle: String
         if hours > 0 {
-            newTitle = String(format: "%02i:%02i:%02i", hours, minutes, seconds)
+            newTitle = fullTimeString
         } else {
             newTitle = String(format: "%02i:%02i", minutes, seconds)
         }

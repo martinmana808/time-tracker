@@ -11,15 +11,12 @@ struct TimerView: View {
     @State private var mode: TrackingMode = .timer
     @State private var selectedProjectId: UUID?
     @State private var currentDescription: String = ""
-    @State private var elapsedSeconds: TimeInterval = 0
     
     @State private var manualStartTime = Date()
     @State private var manualEndTime = Date()
     
     @State private var entryToEdit: TimeEntry? = nil
     
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-
     var body: some View {
         VStack(spacing: 20) {
             // Header timer block
@@ -56,7 +53,7 @@ struct TimerView: View {
                     .disabled(store.activeTimer != nil && mode == .manual)
                     
                     if mode == .timer {
-                        Text(timeString(from: elapsedSeconds))
+                        Text(store.activeTimeString)
                             .font(.system(.body, design: .monospaced))
                             .frame(width: 80)
                         
@@ -65,10 +62,8 @@ struct TimerView: View {
                                 store.stopTimer()
                                 currentDescription = ""
                                 selectedProjectId = nil
-                                elapsedSeconds = 0
                             } else if let pId = selectedProjectId {
                                 store.startTimer(projectId: pId, description: currentDescription)
-                                elapsedSeconds = 0
                             }
                         }) {
                             Image(systemName: store.activeTimer != nil ? "stop.fill" : "play.fill")
@@ -163,18 +158,6 @@ struct TimerView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .onReceive(timer) { _ in
-            if let activeInfo = store.activeTimer {
-                elapsedSeconds = Date().timeIntervalSince(activeInfo.startTime)
-            }
-        }
-        .onAppear {
-            if let activeInfo = store.activeTimer {
-                selectedProjectId = activeInfo.projectId
-                currentDescription = activeInfo.description
-                elapsedSeconds = Date().timeIntervalSince(activeInfo.startTime)
-            }
-        }
         .overlay {
             if let entry = entryToEdit {
                 ZStack {
