@@ -3,9 +3,20 @@ import SwiftUI
 struct TimerView: View {
     @EnvironmentObject var store: TimerStore
     
+    enum TrackingMode {
+        case timer
+        case manual
+    }
+    
+    @State private var mode: TrackingMode = .timer
     @State private var selectedProjectId: UUID?
     @State private var currentDescription: String = ""
     @State private var elapsedSeconds: TimeInterval = 0
+    
+    @State private var manualStartTime = Date()
+    @State private var manualEndTime = Date()
+    
+    @State private var entryToEdit: TimeEntry? = nil
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -13,9 +24,17 @@ struct TimerView: View {
         VStack(spacing: 20) {
             // Header timer block
             VStack(spacing: 15) {
-                Text("Time Tracking")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack {
+                    Text("Time Tracking")
+                        .font(.headline)
+                    Spacer()
+                    Picker("", selection: $mode) {
+                        Text("Timer").tag(TrackingMode.timer)
+                        Text("Manual").tag(TrackingMode.manual)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 200)
+                }
                 
                 HStack(spacing: 10) {
                     TextField("What are you working on?", text: $currentDescription)
@@ -25,6 +44,7 @@ struct TimerView: View {
                                 store.updateActiveTimerDescription(newValue)
                             }
                         }
+                        .disabled(store.activeTimer != nil && mode == .manual)
                     
                     Picker("", selection: $selectedProjectId) {
                         Text("Select Project").tag(UUID?(nil))
@@ -33,31 +53,57 @@ struct TimerView: View {
                         }
                     }
                     .frame(maxWidth: 200)
-                    .disabled(store.activeTimer != nil)
+                    .disabled(store.activeTimer != nil && mode == .manual)
                     
-                    Text(timeString(from: elapsedSeconds))
-                        .font(.system(.body, design: .monospaced))
-                        .frame(width: 80)
-                    
-                    Button(action: {
-                        if store.activeTimer != nil {
-                            store.stopTimer()
-                            currentDescription = ""
-                            selectedProjectId = nil
-                            elapsedSeconds = 0
-                        } else if let pId = selectedProjectId {
-                            store.startTimer(projectId: pId, description: currentDescription)
-                            elapsedSeconds = 0
+                    if mode == .timer {
+                        Text(timeString(from: elapsedSeconds))
+                            .font(.system(.body, design: .monospaced))
+                            .frame(width: 80)
+                        
+                        Button(action: {
+                            if store.activeTimer != nil {
+                                store.stopTimer()
+                                currentDescription = ""
+                                selectedProjectId = nil
+                                elapsedSeconds = 0
+                            } else if let pId = selectedProjectId {
+                                store.startTimer(projectId: pId, description: currentDescription)
+                                elapsedSeconds = 0
+                            }
+                        }) {
+                            Image(systemName: store.activeTimer != nil ? "stop.fill" : "play.fill")
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(store.activeTimer != nil ? Color.red : Color.green)
+                                .cornerRadius(6)
                         }
-                    }) {
-                        Image(systemName: store.activeTimer != nil ? "stop.fill" : "play.fill")
-                            .foregroundColor(.white)
-                            .padding(8)
-                            .background(store.activeTimer != nil ? Color.red : Color.green)
-                            .cornerRadius(6)
+                        .buttonStyle(.plain)
+                        .disabled(store.activeTimer == nil && selectedProjectId == nil)
+                    } else {
+                        DatePicker("", selection: $manualStartTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .frame(width: 80)
+                        
+                        Text("to")
+                            .foregroundColor(.secondary)
+                        
+                        DatePicker("", selection: $manualEndTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .frame(width: 80)
+                        
+                        Button("Add") {
+                            if let pId = selectedProjectId {
+                                let entry = TimeEntry(projectId: pId, description: currentDescription, startTime: manualStartTime, endTime: manualEndTime)
+                                store.addTimeEntry(entry: entry)
+                                currentDescription = ""
+                                selectedProjectId = nil
+                                manualStartTime = Date()
+                                manualEndTime = Date()
+                            }
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(selectedProjectId == nil)
                     }
-                    .buttonStyle(.plain)
-                    .disabled(store.activeTimer == nil && selectedProjectId == nil)
                 }
                 .padding()
                 .background(Color(NSColor.controlBackgroundColor))
@@ -81,30 +127,31 @@ struct TimerView: View {
                         VStack(spacing: 10) {
                             ForEach(store.timeEntries) { entry in
                                 if let project = store.getProject(id: entry.projectId) {
-                                    HStack {
-                                        Circle()
-                                            .fill(Color(hex: project.color) ?? .blue)
-                                            .frame(width: 10, height: 10)
-                                        
-                                        Text(project.name)
-                                            .font(.subheadline)
-                                            .frame(width: 100, alignment: .leading)
-                                        
-                                        TextField("No description", text: Binding(
-                                            get: { entry.description },
-                                            set: { newValue in store.updateTimeEntryDescription(id: entry.id, description: newValue) }
-                                        ))
-                                        .textFieldStyle(.plain)
-                                        .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
-                                        
-                                        Spacer()
-                                        
-                                        Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
-                                            .font(.system(.body, design: .monospaced))
+                                    Button(action: {
+                                        entryToEdit = entry
+                                    }) {
+                                        HStack {
+                                            Circle()
+                                                .fill(Color(hex: project.color) ?? .blue)
+                                                .frame(width: 10, height: 10)
+                                            
+                                            Text(project.name)
+                                                .font(.subheadline)
+                                                .frame(width: 100, alignment: .leading)
+                                            
+                                            Text(entry.description.isEmpty ? "No description" : entry.description)
+                                                .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
+                                            
+                                            Spacer()
+                                            
+                                            Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
+                                                .font(.system(.body, design: .monospaced))
+                                        }
+                                        .padding()
+                                        .background(Color(NSColor.controlBackgroundColor))
+                                        .cornerRadius(8)
                                     }
-                                    .padding()
-                                    .background(Color(NSColor.controlBackgroundColor))
-                                    .cornerRadius(8)
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
@@ -128,6 +175,9 @@ struct TimerView: View {
                 elapsedSeconds = Date().timeIntervalSince(activeInfo.startTime)
             }
         }
+        .sheet(item: $entryToEdit) { entry in
+            EditTimeEntryView(entry: entry)
+        }
     }
     
     func timeString(from timeInterval: TimeInterval) -> String {
@@ -137,3 +187,4 @@ struct TimerView: View {
         return String(format: "%02i:%02i:%02i", hours, minutes, seconds)
     }
 }
+

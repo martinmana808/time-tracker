@@ -181,3 +181,8 @@ Following build complexities and overhead using Node and Electron, the applicati
 ## Request
 > Records, after being created, (timer started and stopped) they should still be editable.
 > And the DESCRIPTION should be able to be modified even when the timer has started already.
+
+<a name="log-20260305-manual-entries"></a>
+## Request
+> ok, but not only the DESCRIPTION, I would like to be able to add the timer as well, and the project.
+> I would like to manually enter records as well.

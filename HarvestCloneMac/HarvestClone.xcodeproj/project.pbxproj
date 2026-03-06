@@ -14,6 +14,7 @@
 		B080FE6F830AF3A75EBBFEA7 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 740CD7E03DC6E471FD4D3479 /* Models.swift */; };
 		C92C1BCC27F0C315700C5EFA /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD182AD829199FF6C45B169 /* ProjectsView.swift */; };
 		D1D9562FD51A215AE792E6E6 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */; };
+		FA5631634C89A7FD91BAA478 /* EditTimeEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03E9CB60B3E6FED4C6C5A84 /* EditTimeEntryView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		ADD6EFB28E27F48C66F26C50 /* HarvestCloneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HarvestCloneApp.swift; sourceTree = "<group>"; };
 		CE268461B0D72DD86778C483 /* TimerStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerStore.swift; sourceTree = "<group>"; };
 		E9F501D431E394B1AB465EE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		F03E9CB60B3E6FED4C6C5A84 /* EditTimeEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTimeEntryView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -62,6 +64,7 @@
 			children = (
 				807BFAD99F6BAC168DF9776D /* ContentView.swift */,
 				A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */,
+				F03E9CB60B3E6FED4C6C5A84 /* EditTimeEntryView.swift */,
 				8AD182AD829199FF6C45B169 /* ProjectsView.swift */,
 				513B5E4348C71C95E33056D0 /* TimerView.swift */,
 			);
@@ -125,6 +128,7 @@
 			files = (
 				799FACB7A9427DEB256C2025 /* ContentView.swift in Sources */,
 				D1D9562FD51A215AE792E6E6 /* DashboardView.swift in Sources */,
+				FA5631634C89A7FD91BAA478 /* EditTimeEntryView.swift in Sources */,
 				512D28B2DC8361FABB2B94B4 /* HarvestCloneApp.swift in Sources */,
 				B080FE6F830AF3A75EBBFEA7 /* Models.swift in Sources */,
 				C92C1BCC27F0C315700C5EFA /* ProjectsView.swift in Sources */,

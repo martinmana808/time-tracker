@@ -63,6 +63,18 @@ class TimerStore: ObservableObject {
         }
     }
     
+    func updateTimeEntry(_ updatedEntry: TimeEntry) {
+        if let index = timeEntries.firstIndex(where: { $0.id == updatedEntry.id }) {
+            timeEntries[index] = updatedEntry
+            saveData()
+        }
+    }
+    
+    func deleteTimeEntry(id: UUID) {
+        timeEntries.removeAll { $0.id == id }
+        saveData()
+    }
+    
     func addTimeEntry(entry: TimeEntry) {
         timeEntries.insert(entry, at: 0)
         saveData()
