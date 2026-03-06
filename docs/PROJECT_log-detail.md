@@ -191,3 +191,8 @@ Following build complexities and overhead using Node and Electron, the applicati
 ## Request
 > when i go edit a record, it opens a dialogue, when i click inside it, the whole app hides.
 > Another thing, I would like, if the timer is running, to have an indication at the top, where the app clock icon is, probably actually have the time running there, say 01:15:23 and counting.
+
+<a name="log-20260306-manual-entry-fab"></a>
+## Request
+> i cannot manually add a record. It should be a RADIO between TIMER and MANUAL. 
+> The manual entry should be a + button at the bottom right, that opens a modal diualog where you can select everything

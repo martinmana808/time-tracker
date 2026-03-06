@@ -3,56 +3,40 @@ import SwiftUI
 struct TimerView: View {
     @EnvironmentObject var store: TimerStore
     
-    enum TrackingMode {
-        case timer
-        case manual
-    }
-    
-    @State private var mode: TrackingMode = .timer
     @State private var selectedProjectId: UUID?
     @State private var currentDescription: String = ""
     
-    @State private var manualStartTime = Date()
-    @State private var manualEndTime = Date()
-    
+    @State private var isAddingEntry: Bool = false
     @State private var entryToEdit: TimeEntry? = nil
     
     var body: some View {
-        VStack(spacing: 20) {
-            // Header timer block
-            VStack(spacing: 15) {
-                HStack {
+        ZStack(alignment: .bottomTrailing) {
+            VStack(spacing: 20) {
+                // Header timer block
+                VStack(spacing: 15) {
                     Text("Time Tracking")
                         .font(.headline)
-                    Spacer()
-                    Picker("", selection: $mode) {
-                        Text("Timer").tag(TrackingMode.timer)
-                        Text("Manual").tag(TrackingMode.manual)
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 200)
-                }
-                
-                HStack(spacing: 10) {
-                    TextField("What are you working on?", text: $currentDescription)
-                        .textFieldStyle(.roundedBorder)
-                        .onChange(of: currentDescription) { newValue in
-                            if store.activeTimer != nil {
-                                store.updateActiveTimerDescription(newValue)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    HStack(spacing: 10) {
+                        TextField("What are you working on?", text: $currentDescription)
+                            .textFieldStyle(.roundedBorder)
+                            .onChange(of: currentDescription) { newValue in
+                                if store.activeTimer != nil {
+                                    store.updateActiveTimerDescription(newValue)
+                                }
+                            }
+                            .disabled(store.activeTimer != nil)
+                        
+                        Picker("", selection: $selectedProjectId) {
+                            Text("Select Project").tag(UUID?(nil))
+                            ForEach(store.projects) { project in
+                                Text(project.name).tag(UUID?(project.id))
                             }
                         }
-                        .disabled(store.activeTimer != nil && mode == .manual)
-                    
-                    Picker("", selection: $selectedProjectId) {
-                        Text("Select Project").tag(UUID?(nil))
-                        ForEach(store.projects) { project in
-                            Text(project.name).tag(UUID?(project.id))
-                        }
-                    }
-                    .frame(maxWidth: 200)
-                    .disabled(store.activeTimer != nil && mode == .manual)
-                    
-                    if mode == .timer {
+                        .frame(maxWidth: 200)
+                        .disabled(store.activeTimer != nil)
+                        
                         Text(store.activeTimeString)
                             .font(.system(.body, design: .monospaced))
                             .frame(width: 80)
@@ -74,90 +58,86 @@ struct TimerView: View {
                         }
                         .buttonStyle(.plain)
                         .disabled(store.activeTimer == nil && selectedProjectId == nil)
-                    } else {
-                        DatePicker("", selection: $manualStartTime, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .frame(width: 80)
-                        
-                        Text("to")
-                            .foregroundColor(.secondary)
-                        
-                        DatePicker("", selection: $manualEndTime, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .frame(width: 80)
-                        
-                        Button("Add") {
-                            if let pId = selectedProjectId {
-                                let entry = TimeEntry(projectId: pId, description: currentDescription, startTime: manualStartTime, endTime: manualEndTime)
-                                store.addTimeEntry(entry: entry)
-                                currentDescription = ""
-                                selectedProjectId = nil
-                                manualStartTime = Date()
-                                manualEndTime = Date()
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .disabled(selectedProjectId == nil)
                     }
+                    .padding()
+                    .background(Color(NSColor.controlBackgroundColor))
+                    .cornerRadius(10)
+                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                 }
-                .padding()
-                .background(Color(NSColor.controlBackgroundColor))
-                .cornerRadius(10)
-                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-            }
-            
-            // Entries
-            VStack(alignment: .leading) {
-                Text("Recent Entries")
-                    .font(.headline)
-                    .padding(.top, 10)
                 
-                if store.timeEntries.isEmpty {
-                    Text("No time entries yet.")
-                        .foregroundColor(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 20)
-                } else {
-                    ScrollView {
-                        VStack(spacing: 10) {
-                            ForEach(store.timeEntries) { entry in
-                                if let project = store.getProject(id: entry.projectId) {
-                                    Button(action: {
-                                        entryToEdit = entry
-                                    }) {
-                                        HStack {
-                                            Circle()
-                                                .fill(Color(hex: project.color) ?? .blue)
-                                                .frame(width: 10, height: 10)
-                                            
-                                            Text(project.name)
-                                                .font(.subheadline)
-                                                .frame(width: 100, alignment: .leading)
-                                            
-                                            Text(entry.description.isEmpty ? "No description" : entry.description)
-                                                .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
-                                            
-                                            Spacer()
-                                            
-                                            Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
-                                                .font(.system(.body, design: .monospaced))
+                // Entries
+                VStack(alignment: .leading) {
+                    Text("Recent Entries")
+                        .font(.headline)
+                        .padding(.top, 10)
+                    
+                    if store.timeEntries.isEmpty {
+                        Text("No time entries yet.")
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, 20)
+                    } else {
+                        ScrollView {
+                            VStack(spacing: 10) {
+                                ForEach(store.timeEntries) { entry in
+                                    if let project = store.getProject(id: entry.projectId) {
+                                        Button(action: {
+                                            entryToEdit = entry
+                                        }) {
+                                            HStack {
+                                                Circle()
+                                                    .fill(Color(hex: project.color) ?? .blue)
+                                                    .frame(width: 10, height: 10)
+                                                
+                                                Text(project.name)
+                                                    .font(.subheadline)
+                                                    .frame(width: 100, alignment: .leading)
+                                                
+                                                Text(entry.description.isEmpty ? "No description" : entry.description)
+                                                    .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
+                                                
+                                                Spacer()
+                                                
+                                                Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
+                                                    .font(.system(.body, design: .monospaced))
+                                            }
+                                            .padding()
+                                            .background(Color(NSColor.controlBackgroundColor))
+                                            .cornerRadius(8)
                                         }
-                                        .padding()
-                                        .background(Color(NSColor.controlBackgroundColor))
-                                        .cornerRadius(8)
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
                                 }
                             }
                         }
                     }
                 }
+                
+                Spacer()
             }
+            .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             
-            Spacer()
+            Button(action: {
+                isAddingEntry = true
+            }) {
+                Image(systemName: "plus")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(.white)
+                    .frame(width: 56, height: 56)
+                    .background(Color.blue)
+                    .clipShape(Circle())
+                    .shadow(color: Color.black.opacity(0.2), radius: 6, x: 0, y: 3)
+            }
+            .buttonStyle(.plain)
+            .padding(30)
         }
-        .padding(20)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .onAppear {
+            if let activeInfo = store.activeTimer {
+                selectedProjectId = activeInfo.projectId
+                currentDescription = activeInfo.description
+            }
+        }
         .overlay {
             if let entry = entryToEdit {
                 ZStack {
@@ -169,6 +149,20 @@ struct TimerView: View {
                         
                     EditTimeEntryView(entry: entry) {
                         entryToEdit = nil
+                    }
+                }
+            }
+            
+            if isAddingEntry {
+                ZStack {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            isAddingEntry = false
+                        }
+                        
+                    AddTimeEntryView {
+                        isAddingEntry = false
                     }
                 }
             }

@@ -11,6 +11,7 @@
 		512D28B2DC8361FABB2B94B4 /* HarvestCloneApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADD6EFB28E27F48C66F26C50 /* HarvestCloneApp.swift */; };
 		799FACB7A9427DEB256C2025 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807BFAD99F6BAC168DF9776D /* ContentView.swift */; };
 		83549E2E05A461D0BB91B7A5 /* TimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513B5E4348C71C95E33056D0 /* TimerView.swift */; };
+		A4E71A2BD3F133F8A1F81CB9 /* AddTimeEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A3CCBA972BFEEE4B9DC396B /* AddTimeEntryView.swift */; };
 		B080FE6F830AF3A75EBBFEA7 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 740CD7E03DC6E471FD4D3479 /* Models.swift */; };
 		C92C1BCC27F0C315700C5EFA /* ProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD182AD829199FF6C45B169 /* ProjectsView.swift */; };
 		D1D9562FD51A215AE792E6E6 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2A3CCBA972BFEEE4B9DC396B /* AddTimeEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTimeEntryView.swift; sourceTree = "<group>"; };
 		513B5E4348C71C95E33056D0 /* TimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerView.swift; sourceTree = "<group>"; };
 		6F4014D2BD8BDE14943E42A4 /* HarvestClone.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HarvestClone.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		740CD7E03DC6E471FD4D3479 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
@@ -62,6 +64,7 @@
 		A0E4CD1F642DE5F505F88BC5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				2A3CCBA972BFEEE4B9DC396B /* AddTimeEntryView.swift */,
 				807BFAD99F6BAC168DF9776D /* ContentView.swift */,
 				A717DD98E8EEB0AF5D0C02CC /* DashboardView.swift */,
 				F03E9CB60B3E6FED4C6C5A84 /* EditTimeEntryView.swift */,
@@ -126,6 +129,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4E71A2BD3F133F8A1F81CB9 /* AddTimeEntryView.swift in Sources */,
 				799FACB7A9427DEB256C2025 /* ContentView.swift in Sources */,
 				D1D9562FD51A215AE792E6E6 /* DashboardView.swift in Sources */,
 				FA5631634C89A7FD91BAA478 /* EditTimeEntryView.swift in Sources */,
