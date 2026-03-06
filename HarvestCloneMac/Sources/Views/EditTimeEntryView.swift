@@ -6,6 +6,9 @@ struct EditTimeEntryView: View {
     @State var entry: TimeEntry
     var onClose: () -> Void
     
+    @State private var hours: Int = 0
+    @State private var minutes: Int = 0
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Edit Entry")
@@ -20,8 +23,10 @@ struct EditTimeEntryView: View {
                     }
                 }
                 
-                DatePicker("Start Time", selection: $entry.startTime)
-                DatePicker("End Time", selection: $entry.endTime)
+                HStack(spacing: 20) {
+                    Stepper("Hours: \(hours)", value: $hours, in: 0...99)
+                    Stepper("Minutes: \(minutes)", value: $minutes, in: 0...59)
+                }
             }
             .padding()
             
@@ -40,10 +45,14 @@ struct EditTimeEntryView: View {
                 }
                 
                 Button("Save") {
+                    let duration = TimeInterval(hours * 3600 + minutes * 60)
+                    entry.endTime = entry.startTime.addingTimeInterval(duration)
+                    
                     store.updateTimeEntry(entry)
                     onClose()
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(hours == 0 && minutes == 0)
             }
             .padding(.horizontal)
         }
@@ -52,5 +61,10 @@ struct EditTimeEntryView: View {
         .background(Color(NSColor.windowBackgroundColor))
         .cornerRadius(12)
         .shadow(radius: 20)
+        .onAppear {
+            let duration = entry.endTime.timeIntervalSince(entry.startTime)
+            hours = Int(duration) / 3600
+            minutes = Int(duration) / 60 % 60
+        }
     }
 }

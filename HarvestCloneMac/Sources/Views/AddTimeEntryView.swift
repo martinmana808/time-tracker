@@ -6,8 +6,8 @@ struct AddTimeEntryView: View {
     
     @State private var currentDescription: String = ""
     @State private var selectedProjectId: UUID?
-    @State private var manualStartTime = Date()
-    @State private var manualEndTime = Date()
+    @State private var hours: Int = 0
+    @State private var minutes: Int = 0
     
     var body: some View {
         VStack(spacing: 20) {
@@ -24,8 +24,10 @@ struct AddTimeEntryView: View {
                     }
                 }
                 
-                DatePicker("Start Time", selection: $manualStartTime)
-                DatePicker("End Time", selection: $manualEndTime)
+                HStack(spacing: 20) {
+                    Stepper("Hours: \(hours)", value: $hours, in: 0...99)
+                    Stepper("Minutes: \(minutes)", value: $minutes, in: 0...59)
+                }
             }
             .padding()
             
@@ -38,13 +40,17 @@ struct AddTimeEntryView: View {
                 
                 Button("Save") {
                     if let pId = selectedProjectId {
-                        let entry = TimeEntry(projectId: pId, description: currentDescription, startTime: manualStartTime, endTime: manualEndTime)
+                        let duration = TimeInterval(hours * 3600 + minutes * 60)
+                        let end = Date()
+                        let start = end.addingTimeInterval(-duration)
+                        
+                        let entry = TimeEntry(projectId: pId, description: currentDescription, startTime: start, endTime: end)
                         store.addTimeEntry(entry: entry)
                         onClose()
                     }
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(selectedProjectId == nil)
+                .disabled(selectedProjectId == nil || (hours == 0 && minutes == 0))
             }
             .padding(.horizontal)
         }

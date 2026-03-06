@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-06] Re-design Native Form Logic to Duration | [Technical Details](./PROJECT_log-detail.md#log-20260306-duration-steppers)
+- Swapped explicit start and end DatePickers with native scrolling Hours and Minutes bindings.
+- Extended the logic directly across Edit and Manual Addition modals so all non-tracking functionality uses precise Duration formatting over Absolute Time selections to seamlessly match standard Harvest platform mechanics.
+
 ### [2026-03-06] Re-design Manual Mode with Floating Action Button | [Technical Details](./PROJECT_log-detail.md#log-20260306-manual-entry-fab)
 - Abandoned the Segment Picker toggle switch logic.
 - Rewrote the tracking screen back to its standard static appearance. Added a floating `+` button in the `.bottomTrailing` corner to act as a permanent Manual Addition shortcut.

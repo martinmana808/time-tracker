@@ -196,3 +196,8 @@ Following build complexities and overhead using Node and Electron, the applicati
 ## Request
 > i cannot manually add a record. It should be a RADIO between TIMER and MANUAL. 
 > The manual entry should be a + button at the bottom right, that opens a modal diualog where you can select everything
+
+<a name="log-20260306-duration-steppers"></a>
+## Request
+> the manual entry should not be FROM datepicker / TO datepicker. 
+> It should be how many hours and minutes you want to add, like harvest does
