@@ -5,6 +5,10 @@ class TimerStore: ObservableObject {
     @Published var projects: [Project] = []
     @Published var timeEntries: [TimeEntry] = []
     @Published var activeTimer: ActiveTimer? = nil
+    @Published var headerTitle: String = "Harvest Clone"
+    @Published var isTimerRunning: Bool = false
+    
+    private var cancellables = Set<AnyCancellable>()
     
     private let fileManager = FileManager.default
     private var dataURL: URL {
@@ -20,6 +24,40 @@ class TimerStore: ObservableObject {
     
     init() {
         loadData()
+        
+        Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                self?.updateHeaderTitle()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateHeaderTitle() {
+        guard let timer = activeTimer else {
+            if headerTitle != "Harvest Clone" {
+                headerTitle = "Harvest Clone"
+                isTimerRunning = false
+            }
+            return
+        }
+        
+        let elapsed = Date().timeIntervalSince(timer.startTime)
+        let hours = Int(elapsed) / 3600
+        let minutes = Int(elapsed) / 60 % 60
+        let seconds = Int(elapsed) % 60
+        
+        let newTitle: String
+        if hours > 0 {
+            newTitle = String(format: "%02i:%02i:%02i", hours, minutes, seconds)
+        } else {
+            newTitle = String(format: "%02i:%02i", minutes, seconds)
+        }
+        
+        if headerTitle != newTitle {
+            headerTitle = newTitle
+            isTimerRunning = true
+        }
     }
     
     func addProject(name: String, color: String) {

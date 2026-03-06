@@ -175,8 +175,20 @@ struct TimerView: View {
                 elapsedSeconds = Date().timeIntervalSince(activeInfo.startTime)
             }
         }
-        .sheet(item: $entryToEdit) { entry in
-            EditTimeEntryView(entry: entry)
+        .overlay {
+            if let entry = entryToEdit {
+                ZStack {
+                    Color.black.opacity(0.5)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            entryToEdit = nil
+                        }
+                        
+                    EditTimeEntryView(entry: entry) {
+                        entryToEdit = nil
+                    }
+                }
+            }
         }
     }
     

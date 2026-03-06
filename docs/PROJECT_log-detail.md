@@ -186,3 +186,8 @@ Following build complexities and overhead using Node and Electron, the applicati
 ## Request
 > ok, but not only the DESCRIPTION, I would like to be able to add the timer as well, and the project.
 > I would like to manually enter records as well.
+
+<a name="log-20260305-menubar-time-dynamic"></a>
+## Request
+> when i go edit a record, it opens a dialogue, when i click inside it, the whole app hides.
+> Another thing, I would like, if the timer is running, to have an indication at the top, where the app clock icon is, probably actually have the time running there, say 01:15:23 and counting.

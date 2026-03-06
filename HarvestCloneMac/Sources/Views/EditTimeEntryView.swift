@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct EditTimeEntryView: View {
-    @Environment(\.dismiss) var dismiss
     @EnvironmentObject var store: TimerStore
     
     @State var entry: TimeEntry
+    var onClose: () -> Void
     
     var body: some View {
         VStack(spacing: 20) {
@@ -28,7 +28,7 @@ struct EditTimeEntryView: View {
             HStack {
                 Button("Delete", role: .destructive) {
                     store.deleteTimeEntry(id: entry.id)
-                    dismiss()
+                    onClose()
                 }
                 .buttonStyle(.bordered)
                 .tint(.red)
@@ -36,12 +36,12 @@ struct EditTimeEntryView: View {
                 Spacer()
                 
                 Button("Cancel") {
-                    dismiss()
+                    onClose()
                 }
                 
                 Button("Save") {
                     store.updateTimeEntry(entry)
-                    dismiss()
+                    onClose()
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -49,5 +49,8 @@ struct EditTimeEntryView: View {
         }
         .padding()
         .frame(width: 400, height: 280)
+        .background(Color(NSColor.windowBackgroundColor))
+        .cornerRadius(12)
+        .shadow(radius: 20)
     }
 }

@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-05] MenuBar Focus Fixes & Active Timing | [Technical Details](./PROJECT_log-detail.md#log-20260305-menubar-time-dynamic)
+- Modified `TimerView` logic to utilize an internal `ZStack` overlay. This permanently prevents `.sheet` window-level interruptions from dismissing the `MenuBarExtra` parent view.
+- Added an active `Timer` publisher natively into `TimerStore` bound to a specific `headerTitle` string, causing the global Apple top menu bar item to visually tick the active hours alongside the icon smoothly.
+
 ### [2026-03-05] Enable Manual Logic & Advanced Editing | [Technical Details](./PROJECT_log-detail.md#log-20260305-manual-entries)
 - Rebuilt standard active inputs natively substituting tracking modes dynamically via Segmented Picker.
 - Introduced declarative editing natively via Apple's `.sheet` pattern. 
