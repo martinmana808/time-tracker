@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-05] Enable Editable Descriptions | [Technical Details](./PROJECT_log-detail.md#log-20260305-edit-descriptions)
+- Refactored SwiftUI inputs to allow active typed descriptions during live ticking.
+- Bound past time entries to discrete TextField components allowing retroactive editing.
+
 ### [2026-03-05] Pure SwiftUI Full Native Rewrite | [Technical Details](./PROJECT_log-detail.md#log-20260305-xcode-migration)
 - Circumvented Node/Electron bundle issues by transitioning entirely to native Swift rendering.
 - Set up automated `xcodegen` schema for deterministic project generation.

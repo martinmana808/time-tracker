@@ -176,4 +176,8 @@ We will build a macOS-native `MenuBarExtra` application using **SwiftUI**. This 
 Following build complexities and overhead using Node and Electron, the application was entirely rebuilt as a pure native macOS target using Xcode/SwiftUI resulting in a blazingly fast, zero-dependency executable.
 1. **SwiftUI Engine**: Models and Views were re-written into native Swift structs and `View` protocols.
 2. **Native MenuBarExtra**: Hooks seamlessly into macOS 13+ native `MenuBarExtra` system APIs.
-3. **Application State**: Converted `Zustand` directly to a native `ObservableObject` backed intimately by `FileManager` parsing data as `.json` seamlessly into Apple's Application Support framework.
+
+<a name="log-20260305-edit-descriptions"></a>
+## Request
+> Records, after being created, (timer started and stopped) they should still be editable.
+> And the DESCRIPTION should be able to be modified even when the timer has started already.

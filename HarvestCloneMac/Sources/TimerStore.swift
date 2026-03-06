@@ -47,6 +47,22 @@ class TimerStore: ObservableObject {
         saveData()
     }
     
+    func updateActiveTimerDescription(_ description: String) {
+        if activeTimer != nil && activeTimer?.description != description {
+            activeTimer?.description = description
+            saveData()
+        }
+    }
+    
+    func updateTimeEntryDescription(id: UUID, description: String) {
+        if let index = timeEntries.firstIndex(where: { $0.id == id }) {
+            if timeEntries[index].description != description {
+                timeEntries[index].description = description
+                saveData()
+            }
+        }
+    }
+    
     func addTimeEntry(entry: TimeEntry) {
         timeEntries.insert(entry, at: 0)
         saveData()

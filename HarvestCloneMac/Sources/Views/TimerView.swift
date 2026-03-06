@@ -20,7 +20,11 @@ struct TimerView: View {
                 HStack(spacing: 10) {
                     TextField("What are you working on?", text: $currentDescription)
                         .textFieldStyle(.roundedBorder)
-                        .disabled(store.activeTimer != nil)
+                        .onChange(of: currentDescription) { newValue in
+                            if store.activeTimer != nil {
+                                store.updateActiveTimerDescription(newValue)
+                            }
+                        }
                     
                     Picker("", selection: $selectedProjectId) {
                         Text("Select Project").tag(UUID?(nil))
@@ -86,8 +90,12 @@ struct TimerView: View {
                                             .font(.subheadline)
                                             .frame(width: 100, alignment: .leading)
                                         
-                                        Text(entry.description.isEmpty ? "No description" : entry.description)
-                                            .foregroundColor(.secondary)
+                                        TextField("No description", text: Binding(
+                                            get: { entry.description },
+                                            set: { newValue in store.updateTimeEntryDescription(id: entry.id, description: newValue) }
+                                        ))
+                                        .textFieldStyle(.plain)
+                                        .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
                                         
                                         Spacer()
                                         
