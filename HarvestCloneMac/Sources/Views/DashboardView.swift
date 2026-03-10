@@ -16,22 +16,50 @@ struct DashboardView: View {
                 .bold()
             
             HStack {
-                StatCard(title: "Total Tracked", value: formatDuration(totalTime))
+                StatCard(title: "Total Tracked", value: store.formatDuration(totalTime))
                 StatCard(title: "Projects", value: "\(store.projects.count)")
                 StatCard(title: "Entries", value: "\(store.timeEntries.count)")
+            }
+            
+            Text("Project Totals")
+                .font(.headline)
+                .padding(.top, 10)
+            
+            if store.projects.isEmpty {
+                Text("No projects available.")
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, 20)
+            } else {
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(store.projects) { project in
+                            HStack {
+                                Circle()
+                                    .fill(Color(hex: project.color) ?? .blue)
+                                    .frame(width: 12, height: 12)
+                                
+                                Text(project.name)
+                                    .font(.headline)
+                                
+                                Spacer()
+                                
+                                Text(store.formatDuration(store.projectTotal(for: project)))
+                                    .font(.system(.body, design: .monospaced))
+                                    .bold()
+                            }
+                            .padding()
+                            .background(Color(NSColor.controlBackgroundColor))
+                            .cornerRadius(10)
+                        }
+                    }
+                }
             }
             
             Spacer()
         }
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    }
-    
-    func formatDuration(_ duration: TimeInterval) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.hour, .minute, .second]
-        formatter.unitsStyle = .abbreviated
-        return formatter.string(from: duration) ?? "0s"
     }
 }
 

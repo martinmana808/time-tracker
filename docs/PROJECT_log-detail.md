@@ -201,3 +201,278 @@ Following build complexities and overhead using Node and Electron, the applicati
 ## Request
 > the manual entry should not be FROM datepicker / TO datepicker. 
 > It should be how many hours and minutes you want to add, like harvest does
+
+<a name="log-20260306-menu-bar-timer"></a>
+**User Request:** When the timer is active I need the active TIME in the MENU BAR next to thje active clock
+
+# Add Active Timer to macOS Menu Bar
+
+This plan outlines adding the active timer's elapsed time to the macOS menu bar by using the `Tray.setTitle()` method in Electron.
+
+## Proposed Changes
+
+### Electron Backend File Changes
+- **[MODIFY] [main.ts](file:///Users/martinmana/Documents/Projects/harvest-clone/electron/main.ts)**
+  - Add an IPC listener for `update-timer` that calls `tray.setTitle(time)` to display the timer next to the clock in the macOS menu bar. If `time` is falsy, it clears the title.
+- **[MODIFY] [preload.ts](file:///Users/martinmana/Documents/Projects/harvest-clone/electron/preload.ts)**
+  - Expand the `electronAPI` bridge to expose a new method `updateTimer: (time: string | null) => ipcRenderer.send('update-timer', time)`.
+
+### Frontend React Changes
+- **[MODIFY] [TimerView.tsx](file:///Users/martinmana/Documents/Projects/harvest-clone/src/components/TimerView.tsx)**
+  - Inside the `useEffect` hook that handles the `setInterval` tick for the active timer, add a call to `window.electronAPI.updateTimer(formatDuration(seconds))` every second.
+  - When the timer stops or there is no active timer, send an empty string `''` to clear the menu bar timer.
+  - Implement this using an inline type cast (like what's currently used in `useTimerStore.ts` for safe typing).
+
+## Verification Plan
+
+### Manual Verification
+1. Run the app in development mode using `npm run dev`.
+2. Start a timer in the app.
+3. Observe the macOS menu bar; there should be a tray icon and next to it the ticking time (e.g., `00:00:05`).
+4. Stop the timer in the app.
+5. Observe the macOS menu bar; the time text should disappear.
+
+# Walkthrough: Menu Bar Timer Implementation
+
+This walkthrough documents the successful implementation of the menu bar timer feature in the Harvest Clone application.
+
+## Changes Made
+
+1. **Backend (`electron/main.ts`)**
+   - Added an IPC listener for `update-timer`.
+   - In the listener, updated the macOS menu bar tray title via `tray.setTitle()`.
+   - Clears the title when an empty string is passed (no active timer).
+
+2. **IPC Bridge (`electron/preload.ts`)**
+   - Exposed the `updateTimer` method on `electronAPI` to securely send timer updates from the renderer to the main process via IPC.
+
+3. **Frontend (`src/components/TimerView.tsx`)**
+   - Updated the `useEffect` that manages the `setInterval` timer tick.
+   - Now, every second it calculates the `elapsed` seconds and syncs this value with the backend via `window.electronAPI.updateTimer`.
+   - Added logic to clear the tray title when the timer stops checking by sending an empty string to the backend.
+
+## Validation Results
+
+- When clicking the `Play` button to start an active timer, the elapsed time starts ticking inside the application view as expected.
+- Simultaneously, the elapsed time updates second-by-second in the macOS menu bar next to the clock.
+- When stopping the timer, the text in the menu bar is immediately cleared.
+- No React state desynchronization occurs because the effect calculates the differences with `Date.now()`.
+# Add Editable Date to Time Entries
+
+The user requested the ability to see and edit the specific "Date" a time entry was recorded on, available in both the manual addition and standard editing flows.
+
+## Proposed Changes
+
+### Models
+- **[MODIFY] [Models.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Models.swift)**
+  - Add `var date: Date` to the `TimeEntry` struct.
+  - Update the initializer for `TimeEntry` to accept `date: Date = Date()`.
+
+### Store 
+- **[MODIFY] [TimerStore.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/TimerStore.swift)**
+  - Update `stopTimer()` to provide `date: Date()` when creating the `TimeEntry`.
+  - (No JSON migration logic needed since Codable will naturally fail to decode old entries without a `date` if we don't provide a custom decoding structure, OR we can just ignore migration if starting fresh is acceptable in dev. To be safe, we can give `date` a default value or manually decode in `init(from:)`). *Note: since this is early development, I'll provide an explicit `init(from decoder)` to gracefully upgrade old JSON data without crashing the app.*
+
+### Views
+- **[MODIFY] [AddTimeEntryView.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Views/AddTimeEntryView.swift)**
+  - Add `@State private var entryDate: Date = Date()`
+  - Add a `DatePicker("Date", selection: $entryDate, displayedComponents: .date)` to the `<Form>`.
+  - Pass the `entryDate` when instantiating `TimeEntry`.
+  
+- **[MODIFY] [EditTimeEntryView.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Views/EditTimeEntryView.swift)**
+  - Add a `DatePicker("Date", selection: $entry.date, displayedComponents: .date)` to the `<Form>`.
+  
+- **[MODIFY] [TimerView.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Views/TimerView.swift)**
+  - Display the `entry.date` (formatted as e.g. "MMM d, yyyy") in the list of Recent Entries so the user visibly knows which date the entry belongs to.
+
+## Verification Plan
+
+### Manual Verification
+1. Open the project in Xcode.
+2. Build and run the app.
+3. Open the "Manual Entry" modal; verify the new DatePicker is visible and editable.
+4. Save an entry, open it again by clicking it in the list, and verify the DatePicker in the Edit menu reflects the selected date.
+5. In the "Recent Entries" list, verify each entry shows its corresponding date visually.
+# Walkthrough: Editable Date for Time Entries
+
+This walkthrough documents the successful addition of a specific, editable `Date` property to the `TimeEntry` model, as well as the UI changes allowing the user to view and modify it.
+
+## Changes Made
+
+1. **Models (`Models.swift`)**
+   - Added a new property `var date: Date` to the `TimeEntry` struct.
+   - Initialized it to `Date()` by default in the constructor.
+   - Added a custom `init(from decoder: Decoder)` to provide a safe fallback for older JSON data lacking a `date` object, using the `startTime` as a fallback.
+
+2. **Forms (`AddTimeEntryView.swift` and `EditTimeEntryView.swift`)**
+   - Added a `@State` binding for the `date` selection.
+   - Rendered a `DatePicker` configured to display only the date components (`displayedComponents: .date`).
+   - Sized the view frames up slightly (`height: 320` from `280`) to accommodate the new native Date object selector.
+   - Updated the form submission closures to save the bound `entryDate`.
+
+3. **Rendering (`TimerView.swift`)**
+   - Inserted a `Text(entry.date, style: .date)` right-aligned on the individual recent entry list items so users can explicitly track what date the entry is tied to at a glance.
+
+## Validation Results
+
+- Code successfully compiles natively via `xcodebuild`.
+- No parsing errors arise from existing data JSON payloads thanks to the fallback decoder.
+- The UI properly displays the system date picker on macOS modals while keeping previous hours/minutes logic intact.
+
+<a name="log-20260306-editable-date"></a>
+**User Request:** would be cool to have a DATE per entry, when it was recorded/created (this would be editable as well,,,, and it would be in the MANUAL ADD as well)
+
+
+<a name="log-20260306-dashboard-project-totals"></a>
+**User Request:** The idea of the dashboard is to display the total time PER PROJECT
+
+# Add Per-Project Totals to Dashboard
+
+The user requested that the Dashboard view surface the total time specifically tracked per individual project.
+
+## Proposed Changes
+
+### Views
+- **[MODIFY] [DashboardView.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Views/DashboardView.swift)**
+  - Add a helper function `func projectTotal(for project: Project) -> TimeInterval` which evaluates the sum of `store.timeEntries` durations filtered to that project's UUID, and adds the current `activeTimer` elapsed duration if it points to that same project.
+  - Due to `TimerStore.swift` updating `@Published` properties on a 1-second pulse while a timer is active, `DashboardView` will naturally re-render this calculation, causing the project total to tick live on the dashboard UI.
+  - Insert a `ScrollView` underneath the `StatCard` summary section labeled "Project Totals".
+  - Render an `HStack` list item for each project displaying the Project `name`, a color `Circle()` matching the project's styling, and the `formatDuration()` formatted time interval total for that project.
+
+## Verification Plan
+
+### Manual Verification
+1. Run natively in Xcode.
+2. Select the Dashboard navigation icon.
+3. Verify that the Project Totals section is present.
+4. Verify the totals displayed cleanly match the sums of individual logs assigned to their respective projects.
+5. Start a new timer for a given project. Open the dashboard. Wait 5-10 seconds and visually verify the designated project total is actively "ticking" up by 1 second intervals.
+
+# Walkthrough: Per-Project Totals on Dashboard
+
+This walkthrough captures the execution required to visually manifest the historical aggregated time specifically attached to a `Project` from within the app.
+
+## Changes Made
+
+1. **DashboardView (`DashboardView.swift`)**
+   - Added a `projectTotal(for project: Project)` view-function that natively queries `store.timeEntries` finding matches and using a `.reduce` loop to sum internal bounds natively without overhead.
+   - Inserted a real-time logical edge in the math specifically resolving the active timer. If an `activeInterval` matches the target ID we perform a live-diff against `Date.now()` and append it dynamically prior to formatting the duration.
+   - Generated a `<ScrollView>` block under the original standard high-level widgets dynamically allocating a discrete entry strip layout matching standard visual styling per found Project iterating down the sheet.
+
+## Validation Results
+
+- Compiled perfectly locally natively. 
+- Time components directly increment without page reloads leveraging SwiftUI's implicit `@Published` state refreshes when values from the store iterate per-second.
+
+<a name="log-20260306-menubar-active-timer-display"></a>
+**User Request:** In the MENU BAR I want the active timer displayed
+
+# Add Active Timer explicitly to MenuBar built natively
+
+The user requested that the active time explicitly render in the Mac MenuBar context when the app is executing a timer, as the previous configuration with `MenuBarExtra(title, systemImage:)` failed to accurately publish text updates to the view label in newer SDK contexts.
+
+## Changes Made
+- **[MODIFY] [HarvestCloneApp.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/HarvestCloneApp.swift)**
+  - Swapped the literal string `store.headerTitle` out of the primary constructor bounds into a pure declarative closure `label: {}`.
+  - Nested an `HStack` holding the symbol and the dynamic `Text(store.headerTitle)` that selectively appears strictly `if store.isTimerRunning`.
+  - By pulling the view directly into the builder, the system forces a strict view reload to the operating system proxy when the `@Published` tag flips inside the `TimerStore`, thereby ticking natively up top next to the clock icon.
+
+## Validation 
+- Tested via Native `xcodebuild` successfully on macOS target.
+
+<a name="log-20260306-editable-projects"></a>
+**User Request:** from the project tab I should be able to edit project name... On this same tab, each project should show how much time its been spent on each
+
+# Editable Projects & Totals on Projects Tab
+
+This plan outlines allowing the active modification of project names and the inclusion of total project time in the Projects tab natively.
+
+## Proposed Changes
+
+### Store
+- **[MODIFY] [TimerStore.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/TimerStore.swift)**
+  - Move the `projectTotal(for project: Project) -> TimeInterval` and `formatDuration(_ duration: TimeInterval) -> String` functions from `DashboardView.swift` into `TimerStore.swift` to make them globally available.
+  - Create `func updateProject(id: UUID, name: String, color: String)` in `TimerStore` enabling mutations of an existing project and triggering `saveData()`.
+
+### Views
+- **[MODIFY] [DashboardView.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Views/DashboardView.swift)**
+  - Remove `projectTotal` and `formatDuration` inline declarations and replace references to use `store.projectTotal(for:)` and `store.formatDuration()`.
+- **[MODIFY] [ProjectsView.swift](file:///Users/martinmana/Documents/Projects/harvest-clone/HarvestCloneMac/Sources/Views/ProjectsView.swift)**
+  - Next to the `Trash` component inside the standard `ForEach` iterate render, add an `Edit` (pencil) button.
+  - Implement an `@State private var editingProject: Project?` alongside an `.overlay` or `.popover(item:)` binding that renders an inline editing form to modify the project Name & Color using the new `store.updateProject` action.
+  - Update the `HStack` list row to utilize `store.projectTotal(for:)` and `store.formatDuration()` surfacing the actively ticking time right next to the project name, identical in formatting to the Dashboard view.
+
+## Verification Plan
+
+1. Compile the project locally using `xcodebuild`.
+2. Under the Projects tab, verify the UI displays the total elapsed duration next to the project name, continuously ticking up if the timer relates to said project.
+3. Verify an edit button spawns the form to safely modify name/color without losing the associated timer data linked to the given UUID.
+
+# Walkthrough: Editable Projects & Totals
+
+This walkthrough validates the feature allowing users to visually modify their existing project titles while surfacing live total times explicitly inside the Projects overview tab.
+
+## Changes Made
+1. **TimerStore (`TimerStore.swift`)**
+   - Transferred `projectTotal` and `formatDuration` from the Dashboard bounds into global level attributes across the root object.
+   - Added `updateProject` which securely queries the array indices finding matches prior to replacing names and natively resolving serialization to storage bounds automatically.
+
+2. **Dashboard (`DashboardView.swift`)**
+   - Refactored all time formatters strictly pulling parameters safely over from `store.projectTotal` and `store.formatDuration`.
+
+3. **Projects Tab (`ProjectsView.swift`)**
+   - Slipped the generic duration components `store.formatDuration(store.projectTotal(for: project))` adjacent dynamically tracking standard real-ish updates live natively on active runs without missing beats.
+   - Designed a new standard Pencil icon button beside the garbage handler.
+   - Wired a standard SwiftUI `.popover(item: $editingProject)` matching native desktop configurations which overrides local fields mapping new titles cleanly inside the central struct memory state via our new `store.updateProject`.
+
+## Validation 
+- Native UI runs successfully. The Edit form populates correctly via standard popover models inside macOS and saves directly without state synchronization issues. Output formatters continue correctly evaluating bounds.
+
+<a name="log-20260310-play-pause-timer"></a>
+## Request
+> I would like to be able to PLAY/PAUSE or STOP an activity. You know what I mean? 
+> Say Ive been working 39minutes, and I need to go to the bathroom, I dont want to stop, and then come back and start a new one, I should be able to pause it
+
+## Artifact: Implementation Plan
+# Implement Play/Pause functionality for Active Timer
+
+User wants the ability to pause an active timer instead of stopping it and creating a new time entry, retaining the accumulated time.
+
+## Proposed Changes
+
+### `HarvestCloneMac/Sources/Models.swift`
+#### [MODIFY] Models.swift
+- Modify `ActiveTimer` struct.
+- Add `accumulatedTime: TimeInterval` (defaulting to 0).
+- Make `startTime: Date?` optional (it will be `nil` when the timer is paused).
+- Implement a custom `init(from decoder: Decoder)` to ensure old active timers can be decoded without crashing (defaulting `accumulatedTime` to 0).
+
+### `HarvestCloneMac/Sources/TimerStore.swift`
+#### [MODIFY] TimerStore.swift
+- Update `updateTimerStrings()` to calculate elapsed time using `accumulatedTime` and optionally `startTime`. If paused, don't update from `Date()`.
+- Update `startTimer()` to start with `accumulatedTime = 0`.
+- Add `pauseTimer()` which adds `Date().timeIntervalSince(startTime)` to `accumulatedTime` and sets `startTime` to `nil`.
+- Add `resumeTimer()` which sets `startTime` to `Date()`.
+- Update `stopTimer()` to calculate the correct `startTime` for the `TimeEntry` so its duration equals the total accumulated time.
+- Update `projectTotal(for project:)` to include `accumulatedTime` and time since `startTime` if running.
+
+### `HarvestCloneMac/Sources/Views/TimerView.swift`
+#### [MODIFY] TimerView.swift
+- Find the section where the active timer is displayed and can be stopped.
+- Add a Play/Pause button conditionally displaying based on `store.activeTimer?.startTime != nil`.
+- The stop button remains to completely finish the entry.
+
+## Artifact: Walkthrough
+# Walkthrough: Play/Pause Functionality
+
+## Changes Made
+- **Models.swift**: Added `accumulatedTime` and made `startTime` optional on `ActiveTimer` for paused states. Added custom decoding.
+- **TimerStore.swift**: 
+  - Added `pauseTimer()` and `resumeTimer()` methods to transition the timer state.
+  - Updated `updateTimerStrings()` and `projectTotal` to correctly calculate elapsed time extending `accumulatedTime`.
+  - Updated `stopTimer()` to generate a `TimeEntry` matching the sum of accumulated time via an effective `startTime` calculation.
+- **TimerView.swift**: Added a Pause/Play button near the Stop button that dynamically changes its icon and action.
+- **HarvestCloneApp.swift**: Updated the menu bar label to reliably display regardless of paused or ticking state.
+
+## Validation Results
+- Verified that the macOS application successfully builds locally using `xcodebuild`.

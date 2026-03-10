@@ -6,6 +6,7 @@ struct AddTimeEntryView: View {
     
     @State private var currentDescription: String = ""
     @State private var selectedProjectId: UUID?
+    @State private var entryDate: Date = Date()
     @State private var hours: Int = 0
     @State private var minutes: Int = 0
     
@@ -23,6 +24,8 @@ struct AddTimeEntryView: View {
                         Text(project.name).tag(UUID?(project.id))
                     }
                 }
+                
+                DatePicker("Date", selection: $entryDate, displayedComponents: .date)
                 
                 HStack(spacing: 20) {
                     Stepper("Hours: \(hours)", value: $hours, in: 0...99)
@@ -44,7 +47,7 @@ struct AddTimeEntryView: View {
                         let end = Date()
                         let start = end.addingTimeInterval(-duration)
                         
-                        let entry = TimeEntry(projectId: pId, description: currentDescription, startTime: start, endTime: end)
+                        let entry = TimeEntry(projectId: pId, description: currentDescription, date: entryDate, startTime: start, endTime: end)
                         store.addTimeEntry(entry: entry)
                         onClose()
                     }
@@ -55,7 +58,7 @@ struct AddTimeEntryView: View {
             .padding(.horizontal)
         }
         .padding()
-        .frame(width: 400, height: 280)
+        .frame(width: 400, height: 320)
         .background(Color(NSColor.windowBackgroundColor))
         .cornerRadius(12)
         .shadow(radius: 20)

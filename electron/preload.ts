@@ -4,4 +4,5 @@ import { contextBridge, ipcRenderer } from 'electron';
 contextBridge.exposeInMainWorld('electronAPI', {
   readStore: (): Promise<string | null> => ipcRenderer.invoke('read-store'),
   writeStore: (data: string): Promise<boolean> => ipcRenderer.invoke('write-store', data),
+  updateTimer: (time: string | null) => ipcRenderer.send('update-timer', time),
 });

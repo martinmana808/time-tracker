@@ -7,6 +7,32 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-10] Play/Pause Active Timer | [Technical Details](./PROJECT_log-detail.md#log-20260310-play-pause-timer)
+- Rewrote the `ActiveTimer` structure bounding explicit calculation variables across `accumulatedTime` to decouple ticking spans.
+- Appended native UI components inside `TimerView` for mid-stream Play/Pause interruptions instead of generating entirely distinct tracking logs.
+- Adjusted `TimerStore` and `HarvestCloneApp` global tracking constraints successfully handling static dormant timer visualization cleanly inside macOS.
+
+### [2026-03-06] Editable Projects & Totals | [Technical Details](./PROJECT_log-detail.md#log-20260306-editable-projects)
+- Updated `ProjectsView` to natively display standard elapsed aggregated tracking time formatted seamlessly.
+- Built a native macOS properties sheet rendering inputs over discrete projects, allowing real-time mutation of existing names globally via a `.popover()` closure.
+
+### [2026-03-06] MenuBar Active Timer Display | [Technical Details](./PROJECT_log-detail.md#log-20260306-menubar-active-timer-display)
+- Explicitly broke out `MenuBarExtra` configuration inside `HarvestCloneApp.swift` to use an encapsulated component block rather than raw parameterized text limits.
+- Forced deep reactive views allowing `store.headerTitle` ticks to update cleanly in realtime globally.
+
+### [2026-03-06] Per-Project Totals on Dashboard | [Technical Details](./PROJECT_log-detail.md#log-20260306-dashboard-project-totals)
+- Added continuous polling and list rendering of precise elapsed totals mapped natively to their associated Projects in the `DashboardView`.
+- Refactored logic checks so the `activeTimer` successfully merges cleanly into the aggregate Historical totals per tick.
+
+### [2026-03-06] Editable Date for Time Entries | [Technical Details](./PROJECT_log-detail.md#log-20260306-editable-date)
+- Updated native `TimeEntry` model to explicitly store a `Date` property.
+- Appended `DatePicker` variables inside the `AddTimeEntryView` and `EditTimeEntryView` to allow explicit setting of the associated event date.
+- Added visual date formatting inside the `TimerView` history entries.
+
+### [2026-03-06] Menu Bar Timer | [Technical Details](./PROJECT_log-detail.md#log-20260306-menu-bar-timer)
+- Added dynamic timer ticking to the macOS menu bar title using Electron's `Tray.setTitle()`.
+- Implemented IPC bridging from the frontend React state (`TimerView.tsx`) to push duration string updates to the Electron backend every second.
+
 ### [2026-03-06] Re-design Native Form Logic to Duration | [Technical Details](./PROJECT_log-detail.md#log-20260306-duration-steppers)
 - Swapped explicit start and end DatePickers with native scrolling Hours and Minutes bindings.
 - Extended the logic directly across Edit and Manual Addition modals so all non-tracking functionality uses precise Duration formatting over Absolute Time selections to seamlessly match standard Harvest platform mechanics.

@@ -52,10 +52,19 @@ export function TimerView() {
     if (activeTimer?.startTime) {
       setElapsed(Math.floor((Date.now() - activeTimer.startTime) / 1000));
       interval = setInterval(() => {
-        setElapsed(Math.floor((Date.now() - activeTimer.startTime!) / 1000));
+        const seconds = Math.floor((Date.now() - activeTimer.startTime!) / 1000);
+        setElapsed(seconds);
+        // Send updated time to electron main process
+        if (typeof window !== 'undefined' && 'electronAPI' in window) {
+          (window as any).electronAPI.updateTimer(formatDuration(seconds));
+        }
       }, 1000);
     } else {
       setElapsed(0);
+      // Clear the timer from the menu bar
+      if (typeof window !== 'undefined' && 'electronAPI' in window) {
+        (window as any).electronAPI.updateTimer('');
+      }
     }
     return () => clearInterval(interval);
   }, [activeTimer]);

@@ -6,6 +6,10 @@ struct ProjectsView: View {
     @State private var newProjectName = ""
     @State private var newProjectColor = "#3B82F6"
     
+    @State private var editingProject: Project? = nil
+    @State private var editProjectName = ""
+    @State private var editProjectColor = ""
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack {
@@ -68,8 +72,27 @@ struct ProjectsView: View {
                                 Circle()
                                     .fill(Color(hex: project.color) ?? .blue)
                                     .frame(width: 12, height: 12)
+                                
                                 Text(project.name)
+                                
                                 Spacer()
+                                
+                                Text(store.formatDuration(store.projectTotal(for: project)))
+                                    .font(.system(.body, design: .monospaced))
+                                    .foregroundColor(.secondary)
+                                    .padding(.trailing, 10)
+                                    
+                                Button(action: {
+                                    editProjectName = project.name
+                                    editProjectColor = project.color
+                                    editingProject = project
+                                }) {
+                                    Image(systemName: "pencil")
+                                        .foregroundColor(.blue)
+                                }
+                                .buttonStyle(.plain)
+                                .padding(.trailing, 5)
+
                                 Button(action: { store.deleteProject(id: project.id) }) {
                                     Image(systemName: "trash")
                                         .foregroundColor(.red)
@@ -86,6 +109,31 @@ struct ProjectsView: View {
         }
         .padding(20)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .popover(item: $editingProject) { project in
+            VStack(spacing: 16) {
+                Text("Edit Project")
+                    .font(.headline)
+                
+                TextField("Project Name", text: $editProjectName)
+                    .textFieldStyle(.roundedBorder)
+                
+                HStack {
+                    Button("Cancel") {
+                        editingProject = nil
+                    }
+                    Button("Save") {
+                        if !editProjectName.isEmpty {
+                            store.updateProject(id: project.id, name: editProjectName, color: editProjectColor)
+                            editingProject = nil
+                        }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(editProjectName.isEmpty)
+                }
+            }
+            .padding()
+            .frame(width: 250)
+        }
     }
 }
 

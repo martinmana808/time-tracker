@@ -23,6 +23,8 @@ struct EditTimeEntryView: View {
                     }
                 }
                 
+                DatePicker("Date", selection: $entry.date, displayedComponents: .date)
+                
                 HStack(spacing: 20) {
                     Stepper("Hours: \(hours)", value: $hours, in: 0...99)
                     Stepper("Minutes: \(minutes)", value: $minutes, in: 0...59)
@@ -57,7 +59,7 @@ struct EditTimeEntryView: View {
             .padding(.horizontal)
         }
         .padding()
-        .frame(width: 400, height: 280)
+        .frame(width: 400, height: 320)
         .background(Color(NSColor.windowBackgroundColor))
         .cornerRadius(12)
         .shadow(radius: 20)

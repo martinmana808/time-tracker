@@ -41,6 +41,23 @@ struct TimerView: View {
                             .font(.system(.body, design: .monospaced))
                             .frame(width: 80)
                         
+                        if store.activeTimer != nil {
+                            Button(action: {
+                                if store.activeTimer?.startTime != nil {
+                                    store.pauseTimer()
+                                } else {
+                                    store.resumeTimer()
+                                }
+                            }) {
+                                Image(systemName: store.activeTimer?.startTime != nil ? "pause.fill" : "play.fill")
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color.orange)
+                                    .cornerRadius(6)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
                         Button(action: {
                             if store.activeTimer != nil {
                                 store.stopTimer()
@@ -97,6 +114,11 @@ struct TimerView: View {
                                                     .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
                                                 
                                                 Spacer()
+                                                
+                                                Text(entry.date, style: .date)
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.secondary)
+                                                    .padding(.trailing, 8)
                                                 
                                                 Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
                                                     .font(.system(.body, design: .monospaced))

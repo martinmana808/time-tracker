@@ -44,7 +44,13 @@ class TimerStore: ObservableObject {
             return
         }
         
-        let elapsed = Date().timeIntervalSince(timer.startTime)
+        let elapsed: TimeInterval
+        if let startTime = timer.startTime {
+            elapsed = timer.accumulatedTime + Date().timeIntervalSince(startTime)
+        } else {
+            elapsed = timer.accumulatedTime
+        }
+        
         let hours = Int(elapsed) / 3600
         let minutes = Int(elapsed) / 60 % 60
         let seconds = Int(elapsed) % 60
@@ -59,9 +65,14 @@ class TimerStore: ObservableObject {
             newTitle = String(format: "%02i:%02i", minutes, seconds)
         }
         
+        let isRunningNow = (timer.startTime != nil)
+        
         if headerTitle != newTitle {
             headerTitle = newTitle
-            isTimerRunning = true
+        }
+        
+        if isTimerRunning != isRunningNow {
+            isTimerRunning = isRunningNow
         }
     }
     
@@ -71,20 +82,57 @@ class TimerStore: ObservableObject {
         saveData()
     }
     
+    func updateProject(id: UUID, name: String, color: String) {
+        if let index = projects.firstIndex(where: { $0.id == id }) {
+            projects[index].name = name
+            projects[index].color = color
+            saveData()
+        }
+    }
+    
     func deleteProject(id: UUID) {
         projects.removeAll { $0.id == id }
         saveData()
     }
     
     func startTimer(projectId: UUID, description: String) {
-        activeTimer = ActiveTimer(projectId: projectId, description: description, startTime: Date())
+        activeTimer = ActiveTimer(projectId: projectId, description: description, startTime: Date(), accumulatedTime: 0)
         saveData()
+    }
+    
+    func pauseTimer() {
+        guard var timer = activeTimer, let startTime = timer.startTime else { return }
+        
+        timer.accumulatedTime += Date().timeIntervalSince(startTime)
+        timer.startTime = nil
+        activeTimer = timer
+        saveData()
+        updateTimerStrings()
+    }
+    
+    func resumeTimer() {
+        guard var timer = activeTimer, timer.startTime == nil else { return }
+        
+        timer.startTime = Date()
+        activeTimer = timer
+        saveData()
+        updateTimerStrings()
     }
     
     func stopTimer() {
         guard let timer = activeTimer else { return }
         
-        let entry = TimeEntry(projectId: timer.projectId, description: timer.description, startTime: timer.startTime, endTime: Date())
+        let endTime = Date()
+        let totalElapsed: TimeInterval
+        if let startTime = timer.startTime {
+            totalElapsed = timer.accumulatedTime + endTime.timeIntervalSince(startTime)
+        } else {
+            totalElapsed = timer.accumulatedTime
+        }
+        
+        let effectiveStartTime = endTime.addingTimeInterval(-totalElapsed)
+        
+        let entry = TimeEntry(projectId: timer.projectId, description: timer.description, startTime: effectiveStartTime, endTime: endTime)
         timeEntries.insert(entry, at: 0)
         activeTimer = nil
         saveData()
@@ -125,6 +173,36 @@ class TimerStore: ObservableObject {
     
     func getProject(id: UUID) -> Project? {
         return projects.first { $0.id == id }
+    }
+    
+    // MARK: - Utilities
+    
+    func projectTotal(for project: Project) -> TimeInterval {
+        let historicalTotal = timeEntries
+            .filter { $0.projectId == project.id }
+            .reduce(0) { total, entry in
+                total + entry.endTime.timeIntervalSince(entry.startTime)
+            }
+        
+        let activeTotal: TimeInterval
+        if let active = activeTimer, active.projectId == project.id {
+            if let startTime = active.startTime {
+                activeTotal = active.accumulatedTime + Date().timeIntervalSince(startTime)
+            } else {
+                activeTotal = active.accumulatedTime
+            }
+        } else {
+            activeTotal = 0
+        }
+        
+        return historicalTotal + activeTotal
+    }
+    
+    func formatDuration(_ duration: TimeInterval) -> String {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.hour, .minute, .second]
+        formatter.unitsStyle = .abbreviated
+        return formatter.string(from: duration) ?? "0s"
     }
     
     // MARK: - Persistence

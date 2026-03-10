@@ -19,6 +19,17 @@ const createTray = () => {
   tray.on('click', (event, bounds) => {
     toggleWindow(bounds);
   });
+
+  // Listen for timer updates
+  ipcMain.on('update-timer', (_, time: string | null) => {
+    if (tray) {
+      if (time) {
+        tray.setTitle(' ' + time);
+      } else {
+        tray.setTitle('');
+      }
+    }
+  });
 };
 
 const createWindow = () => {
