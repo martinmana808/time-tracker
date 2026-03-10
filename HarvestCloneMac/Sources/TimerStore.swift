@@ -145,6 +145,13 @@ class TimerStore: ObservableObject {
         }
     }
     
+    func updateActiveTimerProject(_ projectId: UUID) {
+        if activeTimer != nil && activeTimer?.projectId != projectId {
+            activeTimer?.projectId = projectId
+            saveData()
+        }
+    }
+    
     func updateTimeEntryDescription(id: UUID, description: String) {
         if let index = timeEntries.firstIndex(where: { $0.id == id }) {
             if timeEntries[index].description != description {

@@ -26,7 +26,6 @@ struct TimerView: View {
                                     store.updateActiveTimerDescription(newValue)
                                 }
                             }
-                            .disabled(store.activeTimer != nil)
                         
                         Picker("", selection: $selectedProjectId) {
                             Text("Select Project").tag(UUID?(nil))
@@ -35,7 +34,15 @@ struct TimerView: View {
                             }
                         }
                         .frame(maxWidth: 200)
-                        .disabled(store.activeTimer != nil)
+                        .onChange(of: selectedProjectId) { newValue in
+                            if store.activeTimer != nil {
+                                if let pId = newValue {
+                                    store.updateActiveTimerProject(pId)
+                                } else {
+                                    selectedProjectId = store.activeTimer?.projectId
+                                }
+                            }
+                        }
                         
                         Text(store.activeTimeString)
                             .font(.system(.body, design: .monospaced))

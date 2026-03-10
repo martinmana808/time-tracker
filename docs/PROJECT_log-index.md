@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-10] Edit Active Timer Mid-Flight | [Technical Details](./PROJECT_log-detail.md#log-20260310-edit-midflight)
+- Removed `.disabled(store.activeTimer != nil)` restrictions from `TimerView` for both Project Pickers and Description TextFields.
+- Bound robust state mutations internally via `.onChange` matching direct references inside `TimerStore` enabling seamless on-the-fly corrections.
+
 ### [2026-03-10] Play/Pause Active Timer | [Technical Details](./PROJECT_log-detail.md#log-20260310-play-pause-timer)
 - Rewrote the `ActiveTimer` structure bounding explicit calculation variables across `accumulatedTime` to decouple ticking spans.
 - Appended native UI components inside `TimerView` for mid-stream Play/Pause interruptions instead of generating entirely distinct tracking logs.

@@ -476,3 +476,33 @@ User wants the ability to pause an active timer instead of stopping it and creat
 
 ## Validation Results
 - Verified that the macOS application successfully builds locally using `xcodebuild`.
+
+<a name="log-20260310-edit-midflight"></a>
+## Request
+> The moment it determines what information gets SAVED is when I click STOP. Until then, the description and project can be changed, you know what I mean? It shouldnt be disabled the description and project selector
+
+## Artifact: Implementation Plan
+# Make Active Timer Editable Mid-Flight
+
+Allow changing an active, running timer's Description and Project ID on the fly without waiting to stop the task.
+
+## Proposed Changes
+
+### `HarvestCloneMac/Sources/TimerStore.swift`
+#### [MODIFY] TimerStore.swift
+- Create an `updateActiveTimerProject(_ projectId: UUID)` function ensuring changes to selection map seamlessly back down into native persistence memory.
+
+### `HarvestCloneMac/Sources/Views/TimerView.swift`
+#### [MODIFY] TimerView.swift
+- Strip the static `.disabled()` lock attached to `currentDescription` and `selectedProjectId` input layers.
+- Add an `.onChange(of: selectedProjectId)` closure which evaluates updates directly mapping back into newly created `TimerStore.swift` routes and handles `nil` fallback if a user tries selecting the prompt fallback index.
+
+## Artifact: Walkthrough
+# Walkthrough: Editable Active Timers
+
+## Changes Made
+- **TimerStore.swift**: Appended a specific mutation function updating dynamic `projectId` keys over active instances preventing memory drops.
+- **TimerView.swift**: Removed the interface limits on the Text and Dropdown fields. Validated input listeners catch generic SwiftUI text ticks and dispatch them down natively.
+
+## Validation Results
+- Validated via `xcodebuild` successfully on desktop layout mappings without input warnings.
