@@ -138,6 +138,19 @@ class TimerStore: ObservableObject {
         saveData()
     }
     
+    func resumeTimeEntry(_ entry: TimeEntry) {
+        if activeTimer != nil {
+            stopTimer()
+        }
+        
+        let accumulatedTime = entry.endTime.timeIntervalSince(entry.startTime)
+        let _ = deleteTimeEntry(id: entry.id)
+        
+        activeTimer = ActiveTimer(projectId: entry.projectId, description: entry.description, startTime: Date(), accumulatedTime: accumulatedTime)
+        saveData()
+        updateTimerStrings()
+    }
+    
     func updateActiveTimerDescription(_ description: String) {
         if activeTimer != nil && activeTimer?.description != description {
             activeTimer?.description = description

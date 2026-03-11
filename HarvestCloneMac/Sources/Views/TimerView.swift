@@ -105,36 +105,47 @@ struct TimerView: View {
                             VStack(spacing: 10) {
                                 ForEach(store.timeEntries) { entry in
                                     if let project = store.getProject(id: entry.projectId) {
-                                        Button(action: {
-                                            entryToEdit = entry
-                                        }) {
-                                            HStack {
-                                                Circle()
-                                                    .fill(Color(hex: project.color) ?? .blue)
-                                                    .frame(width: 10, height: 10)
-                                                
-                                                Text(project.name)
-                                                    .font(.subheadline)
-                                                    .frame(width: 100, alignment: .leading)
-                                                
-                                                Text(entry.description.isEmpty ? "No description" : entry.description)
-                                                    .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
-                                                
-                                                Spacer()
-                                                
-                                                Text(entry.date, style: .date)
-                                                    .font(.subheadline)
-                                                    .foregroundColor(.secondary)
-                                                    .padding(.trailing, 8)
-                                                
-                                                Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
-                                                    .font(.system(.body, design: .monospaced))
+                                        HStack {
+                                            Button(action: {
+                                                entryToEdit = entry
+                                            }) {
+                                                HStack {
+                                                    Circle()
+                                                        .fill(Color(hex: project.color) ?? .blue)
+                                                        .frame(width: 10, height: 10)
+                                                    
+                                                    Text(project.name)
+                                                        .font(.subheadline)
+                                                        .frame(width: 100, alignment: .leading)
+                                                    
+                                                    Text(entry.description.isEmpty ? "No description" : entry.description)
+                                                        .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
+                                                    
+                                                    Spacer()
+                                                    
+                                                    Text(entry.date, style: .date)
+                                                        .font(.subheadline)
+                                                        .foregroundColor(.secondary)
+                                                        .padding(.trailing, 8)
+                                                    
+                                                    Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
+                                                        .font(.system(.body, design: .monospaced))
+                                                }
                                             }
-                                            .padding()
-                                            .background(Color(NSColor.controlBackgroundColor))
-                                            .cornerRadius(8)
+                                            .buttonStyle(.plain)
+                                            
+                                            Button(action: {
+                                                store.resumeTimeEntry(entry)
+                                            }) {
+                                                Image(systemName: "play.fill")
+                                                    .foregroundColor(.blue)
+                                                    .padding(.leading, 8)
+                                            }
+                                            .buttonStyle(.plain)
                                         }
-                                        .buttonStyle(.plain)
+                                        .padding()
+                                        .background(Color(NSColor.controlBackgroundColor))
+                                        .cornerRadius(8)
                                     }
                                 }
                             }

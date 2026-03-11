@@ -506,3 +506,45 @@ Allow changing an active, running timer's Description and Project ID on the fly 
 
 ## Validation Results
 - Validated via `xcodebuild` successfully on desktop layout mappings without input warnings.
+
+<a name="log-20260311-resume-timelog"></a>
+## Request
+> a good thingn would be to copy how harvest works in this way: 
+> once an  entry has been created, we could play/pause on that record. That allows us to reuse one of the tasks. 
+> i.e. I work on task A. 15minutes.  I get a call that i need to work on task 5. 20minutes. I finish, and I need to go back to task A, i should be able to click play again in the TASK A 15minutes record
+
+## Artifact: Implementation Plan
+# Implement Resumable Time Entries
+
+The user is looking to mirror Harvest's feature where an already saved (stopped) time entry can be "played" again, which seamlessly restarts the time tracking for that specific activity block. 
+
+## Proposed Changes
+
+### `HarvestCloneMac/Sources/TimerStore.swift`
+#### [MODIFY] TimerStore.swift
+- Add `resumeTimeEntry(_ entry: TimeEntry)` function:
+  - If `store.activeTimer != nil`, call `stopTimer()` to serialize the current task.
+  - Determine the `accumulatedTime` of the target entry `(entry.endTime.timeIntervalSince(entry.startTime))`.
+  - Assign to `activeTimer` using this calculated `accumulatedTime`.
+  - Remove original entry from `timeEntries` list.
+  - Trigger `saveData()` and `updateTimerStrings()`.
+
+### `HarvestCloneMac/Sources/Views/TimerView.swift`
+#### [MODIFY] TimerView.swift
+- Identify the list item for mapping `ForEach(store.timeEntries) { entry in }`.
+- Insert a localized `<Button action={store.resumeTimeEntry(entry)}>` utilizing a "Play" icon right aligned.
+- Wrap the main UI body inside another layout to ensure the `Play` button operates orthogonally without catching the standard click-to-edit row closure binding.
+
+## Artifact: Walkthrough
+# Walkthrough: Resumable Time Entries
+
+## Changes Made
+1. **TimerStore (`TimerStore.swift`)**: 
+   - Wrote `resumeTimeEntry(_ entry:)`. It checks if another timer is running and stops it dynamically. 
+   - Grabs the delta between standard timestamps pushing raw calculations to `accumulatedTime` property over an empty `ActiveTimer`.
+   - Cleans the old list entry avoiding duplicate UI clones.
+2. **TimerView (`TimerView.swift`)**: 
+   - Isolated the row interaction button, attaching an isolated `.plain` `Button` featuring a blue "Play" symbol that pushes that precise mapping array into `store.resumeTimeEntry` seamlessly linking active flow mechanics natively directly onto static logs.
+
+## Validation Results
+- Verified logic binds cleanly without duplicate instances logging inside native `xcodebuild` configurations.

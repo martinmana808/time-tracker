@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-11] Resume Past Time Entries | [Technical Details](./PROJECT_log-detail.md#log-20260311-resume-timelog)
+- Rewrote backend loop inside `TimerStore` enabling dynamic deserialization of fully logged tasks backwards through an active timer slot tracking previous aggregated duration via `accumulatedTime`.
+- Interjected an inline Play button explicitly bound onto discrete `Recent Entries` rows seamlessly bridging back tracking blocks matching standard Harvest behaviour.
+
 ### [2026-03-10] Edit Active Timer Mid-Flight | [Technical Details](./PROJECT_log-detail.md#log-20260310-edit-midflight)
 - Removed `.disabled(store.activeTimer != nil)` restrictions from `TimerView` for both Project Pickers and Description TextFields.
 - Bound robust state mutations internally via `.onChange` matching direct references inside `TimerStore` enabling seamless on-the-fly corrections.
