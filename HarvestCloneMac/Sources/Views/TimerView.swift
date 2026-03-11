@@ -136,6 +136,8 @@ struct TimerView: View {
                                             
                                             Button(action: {
                                                 store.resumeTimeEntry(entry)
+                                                selectedProjectId = entry.projectId
+                                                currentDescription = entry.description
                                             }) {
                                                 Image(systemName: "play.fill")
                                                     .foregroundColor(.blue)
