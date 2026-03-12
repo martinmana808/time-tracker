@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-11] UI Polish: Tab Hit Zones & Active Highlighting | [Technical Details](./PROJECT_log-detail.md#log-20260311-ui-polish)
+- Added `.contentShape(Rectangle())` to `TabButton` fixing native macOS SwiftUI padding zones dropping user pointer clicks. 
+- Injected dynamic background tint and colored border overlays explicitly targeting the active inline tracking row bringing visual prominence to live entries.
+
 ### [2026-03-11] Horizontal Tab Navigation | [Technical Details](./PROJECT_log-detail.md#log-20260311-horizontal-tabs)
 - Refactored `ContentView.swift` replacing the 180px fixed width `HStack` sidebar.
 - Implemented a unified top-aligned `VStack` housing the App Logo, `TabButton` selectors, and the Quit action inside a compact `HStack` header.

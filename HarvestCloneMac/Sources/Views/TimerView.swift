@@ -178,8 +178,12 @@ struct TimerView: View {
                                             }
                                         }
                                         .padding()
-                                        .background(Color(NSColor.controlBackgroundColor))
+                                        .background(store.activeTimer?.entryId == entry.id ? Color.accentColor.opacity(0.08) : Color(NSColor.controlBackgroundColor))
                                         .cornerRadius(8)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .stroke(store.activeTimer?.entryId == entry.id ? Color.accentColor.opacity(0.5) : Color.clear, lineWidth: 1)
+                                        )
                                     }
                                 }
                             }

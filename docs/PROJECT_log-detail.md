@@ -618,3 +618,47 @@ We will restructure this by:
 
 ## Validation Results
 - Tested via `xcodebuild` seamlessly. The layout is significantly cleaner and reclaims all 180px of width for the actual tracking descriptions/time logs underneath.
+
+<a name="log-20260311-ui-polish"></a>
+## Request
+> Time, Dashboard, and Project should be more clickable. Right now you have to click exactly on the word or in the icon. The whole button should be clickable. When we have the records list and we resume any of the records, there should be an extra visual indication that one of them is active. 
+
+## Artifact: Implementation Plan
+# Implement UI Polish
+
+The user requested two UI improvements following the recent structural changes:
+1. Make the top horizontal tabs entirely clickable (currently you have to hit the logo or text directly).
+2. Draw extra visual attention to an inline time entry when it is actively ticking, so it doesn't get lost in the list of white boxes.
+
+## Approach
+
+1. **Clickable Hit Targets in SwiftUI Buttons**: 
+   When using `.buttonStyle(.plain)` in SwiftUI on macOS, only the opaque content (text/images) is actually clickable. Even if padding is applied, the transparent padded area does not receive clicks unless you define a content shape. We fix this by inserting `.contentShape(Rectangle())` right before styling the button's background.
+
+2. **Active Row Highlighting**:
+   In `TimerView`, the `Recent Entries` list maps `ForEach` rows inside a main `HStack` block.
+   We can apply conditional styling dynamically based on `if store.activeTimer?.entryId == entry.id` right onto the `HStack` container modifiers.
+   We'll give the active row a soft tint (e.g. `Color.accentColor.opacity(0.1)`) instead of the standard control background color, and a 1px solid stroke using an `.overlay` to frame it distinctly.
+
+## Proposed Changes
+
+### `HarvestCloneMac/Sources/Views/ContentView.swift`
+#### [MODIFY] ContentView.swift
+Locate `TabButton`'s internal label `HStack`.
+Add `.contentShape(Rectangle())` below the `.padding` modifiers but before `.background`, forcing the entire padded rectangular region to behave as a click target.
+
+### `HarvestCloneMac/Sources/Views/TimerView.swift`
+#### [MODIFY] TimerView.swift
+Locate the main row `HStack` inside the `ForEach(store.timeEntries) { entry in }` block.
+Modify the `.background()` to conditionally switch to a tinted highlight if active.
+Add an `.overlay(RoundedRectangle(cornerRadius: 8).stroke(...))` conditionally rendering a bright border if active.
+
+## Artifact: Walkthrough
+# Walkthrough: UI Click Zones & Active Highlights
+
+## Changes Made
+- **ContentView.swift**: Appended `.contentShape(Rectangle())` bridging padding hit states to mouse clicks inside native `.plain` stylings across generic tabs.
+- **TimerView.swift**: Intercepted the root row background applying soft visual tints bounding actively running matching `store.activeTimer?.entryId` arrays wrapping a matching structured `stroke` border resolving list visual hierarchy. 
+
+## Validation Results
+- Tested natively via `xcodebuild` parsing. Visual overlays map natively.
