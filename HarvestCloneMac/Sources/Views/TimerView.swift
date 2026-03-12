@@ -209,14 +209,8 @@ struct TimerView: View {
             }
             .buttonStyle(.plain)
             .padding(30)
-        }
-        .onAppear {
-            if let activeInfo = store.activeTimer {
-                selectedProjectId = activeInfo.projectId
-                currentDescription = activeInfo.description
-            }
-        }
-        .overlay {
+            .zIndex(10)
+            
             if let entry = entryToEdit {
                 ZStack {
                     Color.black.opacity(0.5)
@@ -229,6 +223,7 @@ struct TimerView: View {
                         entryToEdit = nil
                     }
                 }
+                .zIndex(100)
             }
             
             if isAddingEntry {
@@ -243,6 +238,13 @@ struct TimerView: View {
                         isAddingEntry = false
                     }
                 }
+                .zIndex(100)
+            }
+        }
+        .onAppear {
+            if let activeInfo = store.activeTimer {
+                selectedProjectId = activeInfo.projectId
+                currentDescription = activeInfo.description
             }
         }
     }
