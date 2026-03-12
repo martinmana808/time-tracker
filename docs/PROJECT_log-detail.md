@@ -622,13 +622,15 @@ We will restructure this by:
 <a name="log-20260311-ui-polish"></a>
 ## Request
 > Time, Dashboard, and Project should be more clickable. Right now you have to click exactly on the word or in the icon. The whole button should be clickable. When we have the records list and we resume any of the records, there should be an extra visual indication that one of them is active. 
+> the add manual time z-index should be at the very top
 
 ## Artifact: Implementation Plan
 # Implement UI Polish
 
-The user requested two UI improvements following the recent structural changes:
+The user requested three UI improvements following the recent structural changes:
 1. Make the top horizontal tabs entirely clickable (currently you have to hit the logo or text directly).
 2. Draw extra visual attention to an inline time entry when it is actively ticking, so it doesn't get lost in the list of white boxes.
+3. Fix the rendering z-index of the manual `AddTimeEntryView` so it doesn't display underneath the shadowed floating button natively on macOS.
 
 ## Approach
 
@@ -639,6 +641,10 @@ The user requested two UI improvements following the recent structural changes:
    In `TimerView`, the `Recent Entries` list maps `ForEach` rows inside a main `HStack` block.
    We can apply conditional styling dynamically based on `if store.activeTimer?.entryId == entry.id` right onto the `HStack` container modifiers.
    We'll give the active row a soft tint (e.g. `Color.accentColor.opacity(0.1)`) instead of the standard control background color, and a 1px solid stroke using an `.overlay` to frame it distinctly.
+
+3. **Z-Index Layer Masking**:
+   macOS SwiftUI often glitches handling shadowed float components drawing them over declarative `.overlay` blocks linked at the top view level. 
+   We will drop the `.overlay` view handler entirely and transition it immediately into the base `ZStack`, explicitly flagging the view forms with `.zIndex(100)`.
 
 ## Proposed Changes
 
@@ -652,13 +658,15 @@ Add `.contentShape(Rectangle())` below the `.padding` modifiers but before `.bac
 Locate the main row `HStack` inside the `ForEach(store.timeEntries) { entry in }` block.
 Modify the `.background()` to conditionally switch to a tinted highlight if active.
 Add an `.overlay(RoundedRectangle(cornerRadius: 8).stroke(...))` conditionally rendering a bright border if active.
+Drop the `.overlay` mapping blocks generating the form views, shift them inside the core rendering stack and apply `.zIndex(100)` logic blocks manually.
 
 ## Artifact: Walkthrough
-# Walkthrough: UI Click Zones & Active Highlights
+# Walkthrough: UI Click Zones, Z-Indexes & Active Highlights
 
 ## Changes Made
 - **ContentView.swift**: Appended `.contentShape(Rectangle())` bridging padding hit states to mouse clicks inside native `.plain` stylings across generic tabs.
 - **TimerView.swift**: Intercepted the root row background applying soft visual tints bounding actively running matching `store.activeTimer?.entryId` arrays wrapping a matching structured `stroke` border resolving list visual hierarchy. 
+- **TimerView.swift**: Converted the `entryToEdit` and `isAddingEntry` standard UI layouts directly inside the master layout `ZStack` dropping Apple's internal `.overlay` hierarchy calculations replacing it manually defining a `.zIndex` of 100 overriding float layers cleanly.
 
 ## Validation Results
-- Tested natively via `xcodebuild` parsing. Visual overlays map natively.
+- Tested natively via `xcodebuild` parsing. Visual overlays map natively, shadows drop correctly underneath, and bounding logic highlights successfully.
