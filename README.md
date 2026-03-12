@@ -1,73 +1,31 @@
-# React + TypeScript + Vite
+# Harvest Clone (macOS)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A native macOS menu bar application built with SwiftUI to seamlessly track time against projects, mimicking the core experience of [Harvest](https://www.getharvest.com/).
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Native Menu Bar App**: Lives entirely in your Mac's menu bar for lightweight, instant access.
+- **Time Tracking**: Start, pause, and stop timers associated with specific projects and descriptions.
+- **Inline Resumption**: Seamlessly resume past time entries. Clicking play on a historical entry resumes the tracker natively in the list, exactly like Harvest.
+- **Mid-Flight Editing**: Edit the project association and description of a running timer without having to stop it.
+- **Local Persistence**: All projects and time entries are saved to your local Application Support directory instantly.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Language**: Swift
+- **UI Framework**: SwiftUI
+- **Architecture**: `ObservableObject` state management tracking a central `TimerStore`.
+- **Target**: macOS 13.0+
 
-## Expanding the ESLint configuration
+## Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Open `HarvestCloneMac/HarvestClone.xcodeproj` natively in Xcode to view, modify, and build the target.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+# Build the project via CLI
+xcodebuild -project HarvestCloneMac/HarvestClone.xcodeproj -scheme HarvestClone build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture Notes
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Check out `./docs/` for a comprehensive historical ledger (`PROJECT_log-detail.md`) capturing architectural decisions, implementation walkthroughs, and iterative feature bounds tracked strictly to the project's evolution.
