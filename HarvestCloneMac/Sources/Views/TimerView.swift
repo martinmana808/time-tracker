@@ -44,11 +44,11 @@ struct TimerView: View {
                             }
                         }
                         
-                        Text(store.activeTimeString)
+                        Text(store.activeTimer?.entryId == nil ? store.activeTimeString : "00:00:00")
                             .font(.system(.body, design: .monospaced))
                             .frame(width: 80)
                         
-                        if store.activeTimer != nil {
+                        if store.activeTimer != nil && store.activeTimer?.entryId == nil {
                             Button(action: {
                                 if store.activeTimer?.startTime != nil {
                                     store.pauseTimer()
@@ -66,7 +66,7 @@ struct TimerView: View {
                         }
 
                         Button(action: {
-                            if store.activeTimer != nil {
+                            if store.activeTimer != nil && store.activeTimer?.entryId == nil {
                                 store.stopTimer()
                                 currentDescription = ""
                                 selectedProjectId = nil
@@ -74,14 +74,14 @@ struct TimerView: View {
                                 store.startTimer(projectId: pId, description: currentDescription)
                             }
                         }) {
-                            Image(systemName: store.activeTimer != nil ? "stop.fill" : "play.fill")
+                            Image(systemName: (store.activeTimer != nil && store.activeTimer?.entryId == nil) ? "stop.fill" : "play.fill")
                                 .foregroundColor(.white)
                                 .padding(8)
-                                .background(store.activeTimer != nil ? Color.red : Color.green)
+                                .background((store.activeTimer != nil && store.activeTimer?.entryId == nil) ? Color.red : Color.green)
                                 .cornerRadius(6)
                         }
                         .buttonStyle(.plain)
-                        .disabled(store.activeTimer == nil && selectedProjectId == nil)
+                        .disabled((store.activeTimer == nil) && selectedProjectId == nil)
                     }
                     .padding()
                     .background(Color(NSColor.controlBackgroundColor))
@@ -127,23 +127,55 @@ struct TimerView: View {
                                                         .font(.subheadline)
                                                         .foregroundColor(.secondary)
                                                         .padding(.trailing, 8)
-                                                    
-                                                    Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
-                                                        .font(.system(.body, design: .monospaced))
                                                 }
                                             }
                                             .buttonStyle(.plain)
                                             
-                                            Button(action: {
-                                                store.resumeTimeEntry(entry)
-                                                selectedProjectId = entry.projectId
-                                                currentDescription = entry.description
-                                            }) {
-                                                Image(systemName: "play.fill")
-                                                    .foregroundColor(.blue)
-                                                    .padding(.leading, 8)
+                                            // Conditional Right Aligned UI 
+                                            if store.activeTimer?.entryId == entry.id {
+                                                // Timer is actively running here implicitly
+                                                Text(store.activeTimeString)
+                                                    .font(.system(.body, design: .monospaced))
+                                                    .foregroundColor(.blue) // Highlight it so user knows it's mutating
+                                                
+                                                Button(action: {
+                                                    if store.activeTimer?.startTime != nil {
+                                                        store.pauseTimer()
+                                                    } else {
+                                                        store.resumeTimer()
+                                                    }
+                                                }) {
+                                                    Image(systemName: store.activeTimer?.startTime != nil ? "pause.fill" : "play.fill")
+                                                        .foregroundColor(.orange)
+                                                        .padding(.leading, 8)
+                                                }
+                                                .buttonStyle(.plain)
+                                                
+                                                Button(action: {
+                                                    store.stopTimer() // Stops this row cleanly returning text view layout natively
+                                                }) {
+                                                    Image(systemName: "stop.fill")
+                                                        .foregroundColor(.red)
+                                                        .padding(.leading, 4)
+                                                }
+                                                .buttonStyle(.plain)
+
+                                            } else {
+                                                // Default historical data display
+                                                Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
+                                                    .font(.system(.body, design: .monospaced))
+                                            
+                                                Button(action: {
+                                                    store.resumeTimeEntry(entry)
+                                                    selectedProjectId = entry.projectId
+                                                    currentDescription = entry.description
+                                                }) {
+                                                    Image(systemName: "play.fill")
+                                                        .foregroundColor(.blue)
+                                                        .padding(.leading, 8)
+                                                }
+                                                .buttonStyle(.plain)
                                             }
-                                            .buttonStyle(.plain)
                                         }
                                         .padding()
                                         .background(Color(NSColor.controlBackgroundColor))

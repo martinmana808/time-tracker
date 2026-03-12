@@ -53,16 +53,18 @@ struct ActiveTimer: Codable {
     var description: String
     var startTime: Date?
     var accumulatedTime: TimeInterval
+    var entryId: UUID?
     
-    init(projectId: UUID, description: String, startTime: Date?, accumulatedTime: TimeInterval = 0) {
+    init(projectId: UUID, description: String, startTime: Date?, accumulatedTime: TimeInterval = 0, entryId: UUID? = nil) {
         self.projectId = projectId
         self.description = description
         self.startTime = startTime
         self.accumulatedTime = accumulatedTime
+        self.entryId = entryId
     }
     
     enum CodingKeys: String, CodingKey {
-        case projectId, description, startTime, accumulatedTime
+        case projectId, description, startTime, accumulatedTime, entryId
     }
     
     init(from decoder: Decoder) throws {
@@ -71,5 +73,6 @@ struct ActiveTimer: Codable {
         description = try container.decode(String.self, forKey: .description)
         startTime = try container.decodeIfPresent(Date.self, forKey: .startTime)
         accumulatedTime = try container.decodeIfPresent(TimeInterval.self, forKey: .accumulatedTime) ?? 0
+        entryId = try container.decodeIfPresent(UUID.self, forKey: .entryId)
     }
 }

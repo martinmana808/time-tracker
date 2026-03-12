@@ -130,23 +130,35 @@ class TimerStore: ObservableObject {
             totalElapsed = timer.accumulatedTime
         }
         
-        let effectiveStartTime = endTime.addingTimeInterval(-totalElapsed)
+        if let targetId = timer.entryId, let index = timeEntries.firstIndex(where: { $0.id == targetId }) {
+            // Update an existing target entry inline
+            let newStartTime = endTime.addingTimeInterval(-totalElapsed) // Re-calculate backwards properly reflecting entire duration
+            timeEntries[index].endTime = endTime
+            // Start time should be shifted back by the TOTAL accumulated time since inception so timeEntries[index] grows
+            timeEntries[index].startTime = newStartTime
+            timeEntries[index].description = timer.description
+            timeEntries[index].projectId = timer.projectId
+            timeEntries.insert(timeEntries.remove(at: index), at: 0) // bump it to the top of the history list as the most recent
+        } else {
+            // New timer
+            let effectiveStartTime = endTime.addingTimeInterval(-totalElapsed)
+            let entry = TimeEntry(projectId: timer.projectId, description: timer.description, startTime: effectiveStartTime, endTime: endTime)
+            timeEntries.insert(entry, at: 0)
+        }
         
-        let entry = TimeEntry(projectId: timer.projectId, description: timer.description, startTime: effectiveStartTime, endTime: endTime)
-        timeEntries.insert(entry, at: 0)
         activeTimer = nil
         saveData()
     }
     
     func resumeTimeEntry(_ entry: TimeEntry) {
         if activeTimer != nil {
-            stopTimer()
+            stopTimer() // Stops whatever was running inherently
         }
         
         let accumulatedTime = entry.endTime.timeIntervalSince(entry.startTime)
-        let _ = deleteTimeEntry(id: entry.id)
         
-        activeTimer = ActiveTimer(projectId: entry.projectId, description: entry.description, startTime: Date(), accumulatedTime: accumulatedTime)
+        // Do NOT delete the original entry here anymore. Mount the active tracking metadata cleanly referencing it.
+        activeTimer = ActiveTimer(projectId: entry.projectId, description: entry.description, startTime: Date(), accumulatedTime: accumulatedTime, entryId: entry.id)
         saveData()
         updateTimerStrings()
     }

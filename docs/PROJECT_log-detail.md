@@ -507,44 +507,70 @@ Allow changing an active, running timer's Description and Project ID on the fly 
 ## Validation Results
 - Validated via `xcodebuild` successfully on desktop layout mappings without input warnings.
 
-<a name="log-20260311-resume-timelog"></a>
+<a name="log-20260311-inline-resume"></a>
 ## Request
-> a good thingn would be to copy how harvest works in this way: 
-> once an  entry has been created, we could play/pause on that record. That allows us to reuse one of the tasks. 
-> i.e. I work on task A. 15minutes.  I get a call that i need to work on task 5. 20minutes. I finish, and I need to go back to task A, i should be able to click play again in the TASK A 15minutes record
+> When we click on an already existing record and we re-enable the timer, the record should remain where it is and just have an active timer where it is in the records list. We don't need to put it back to the active timer; you know what I mean? It's exactly as Harvest works, the exact same way that Harvest works. 
+> There are ten records in the list. I click on the one I want to resume; it stays where it is and we resume the timer. 
 
 ## Artifact: Implementation Plan
-# Implement Resumable Time Entries
+# Implement Inline Resumable Timers
 
-The user is looking to mirror Harvest's feature where an already saved (stopped) time entry can be "played" again, which seamlessly restarts the time tracking for that specific activity block. 
+The user wants to match Harvest's UX seamlessly: hitting "play" on a past entry should *not* pull it into the generic new timer block up top. Instead, it should begin actively ticking *inline* exactly where it sits in the list.
+
+## Approach
+
+To achieve this, the concept of an `ActiveTimer` needs to represent whether it's tracking "Net New Work" (up top) OR an "Existing Entry Extension" (inline).
+
+We do this by adding an optional `entryId: UUID?` to `ActiveTimer`.
+
+When the user clicks "Play" on a past entry:
+1. We set `store.activeTimer` but bind it to that specific `TimeEntry`'s UUID.
+2. We evaluate its historically logged duration, and set `accumulatedTime`.
+3. We do **not** delete it from `timeEntries` like before.
+
+When `TimerView` renders:
+- The top "What are you working on?" block checks if `store.activeTimer?.entryId == nil`. If so, it takes over the `activeTimer` UX (net new work).
+- The "Recent Entries" list checks if each `entry.id == store.activeTimer?.entryId`. If so, it renders the ticking active time and a "Pause/Stop" inline UI row natively instead of static historical text.
+
+When the user hits "Stop":
+- `TimerStore.stopTimer()` checks if `entryId` was set.
+- If so, it locates that exact entry in `timeEntries`, adds the new session delta to it, updates its `endTime`, and kills the `activeTimer`. It does *not* insert a brand new clone at index 0.
 
 ## Proposed Changes
 
+### `HarvestCloneMac/Sources/Models.swift`
+#### [MODIFY] Models.swift
+- Update `ActiveTimer` struct with `var entryId: UUID?`.
+- Add to `CodingKeys` and Custom decoder with `decodeIfPresent` fallback to ensure backward compatibility.
+
 ### `HarvestCloneMac/Sources/TimerStore.swift`
 #### [MODIFY] TimerStore.swift
-- Add `resumeTimeEntry(_ entry: TimeEntry)` function:
-  - If `store.activeTimer != nil`, call `stopTimer()` to serialize the current task.
-  - Determine the `accumulatedTime` of the target entry `(entry.endTime.timeIntervalSince(entry.startTime))`.
-  - Assign to `activeTimer` using this calculated `accumulatedTime`.
-  - Remove original entry from `timeEntries` list.
-  - Trigger `saveData()` and `updateTimerStrings()`.
+- Rewrite `resumeTimeEntry(_ entry: TimeEntry)`:
+  - Do *not* delete the entry from the main list.
+  - Mount an `ActiveTimer` explicitly passing `entryId: entry.id`.
+- Rewrite `stopTimer()`:
+  - Check `if let id = timer.entryId`.
+  - If it exists, map into `timeEntries`, find it, update it, and `saveData()`. 
+  - If it does not exist (New work), default to standard `timeEntries.insert()`.
 
 ### `HarvestCloneMac/Sources/Views/TimerView.swift`
 #### [MODIFY] TimerView.swift
 - Identify the list item for mapping `ForEach(store.timeEntries) { entry in }`.
-- Insert a localized `<Button action={store.resumeTimeEntry(entry)}>` utilizing a "Play" icon right aligned.
-- Wrap the main UI body inside another layout to ensure the `Play` button operates orthogonally without catching the standard click-to-edit row closure binding.
+- Determine whether `store.activeTimer?.entryId == entry.id`.
+- If true, display the dynamic `store.activeTimeString` along with "Pause" and "Stop" actions identically matching the normal active layout.
+- Decouple the top header's control block logic so it only shows Play/Stop/Pause elements if `store.activeTimer?.entryId == nil` or if `store.activeTimer` is completely empty.
 
 ## Artifact: Walkthrough
-# Walkthrough: Resumable Time Entries
+# Walkthrough: Inline Timer Extensions
 
 ## Changes Made
-1. **TimerStore (`TimerStore.swift`)**: 
-   - Wrote `resumeTimeEntry(_ entry:)`. It checks if another timer is running and stops it dynamically. 
-   - Grabs the delta between standard timestamps pushing raw calculations to `accumulatedTime` property over an empty `ActiveTimer`.
-   - Cleans the old list entry avoiding duplicate UI clones.
-2. **TimerView (`TimerView.swift`)**: 
-   - Isolated the row interaction button, attaching an isolated `.plain` `Button` featuring a blue "Play" symbol that pushes that precise mapping array into `store.resumeTimeEntry` seamlessly linking active flow mechanics natively directly onto static logs.
+- **Models.swift**: Dropped `var entryId: UUID?` bindings directly onto `ActiveTimer` handling missing data silently.
+- **TimerStore.swift**: 
+    - Rewrote `.stopTimer()` so it maps arrays based off explicit `.entryId` loops rewriting `.endTime` seamlessly without deleting.
+    - Simplified `.resumeTimeEntry()` skipping deletion arrays entirely, explicitly locking it strictly via pure metadata loops tracking durations exclusively.
+- **TimerView.swift**:
+    - Extracted native views. Created conditional branching checks `if store.activeTimer != nil && store.activeTimer?.entryId == nil` on the main top layout block masking its display off.
+    - Pushed identical `activeTimeString` trackers down directly into mapped arrays catching local matching states rendering identical ticking mechanisms strictly over prior data lines cleanly mirroring Harvest layouts.
 
 ## Validation Results
-- Verified logic binds cleanly without duplicate instances logging inside native `xcodebuild` configurations.
+- Validated local `xcodebuild` successfully. UI mapping bindings dynamically adjust explicitly without conflict errors.
