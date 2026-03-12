@@ -7,6 +7,11 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-11] Horizontal Tab Navigation | [Technical Details](./PROJECT_log-detail.md#log-20260311-horizontal-tabs)
+- Refactored `ContentView.swift` replacing the 180px fixed width `HStack` sidebar.
+- Implemented a unified top-aligned `VStack` housing the App Logo, `TabButton` selectors, and the Quit action inside a compact `HStack` header.
+- Reclaimed significant horizontal real estate allowing greater width for inline tracking descriptions.
+
 ### [2026-03-11] Inline Resume Tracking | [Technical Details](./PROJECT_log-detail.md#log-20260311-inline-resume)
 - Updated `ActiveTimer` logic internally embedding a pointer back down into an `entryId`.
 - Rewrote the main `TimerView` layout dropping top-level UI mutations if a timer extends an existing entry, migrating ticking data loops inside individual List elements exactly mimicking Harvest.

@@ -11,39 +11,43 @@ struct ContentView: View {
     @State private var currentTab: Tab = .timer
 
     var body: some View {
-        HStack(spacing: 0) {
-            // Sidebar
-            VStack {
-                HStack {
+        VStack(spacing: 0) {
+            // Top Navigation Header
+            HStack(spacing: 20) {
+                HStack(spacing: 8) {
                     Image(systemName: "timer")
                         .foregroundColor(.orange)
+                        .font(.system(size: 18))
                     Text("HarvestClone")
                         .font(.headline)
                 }
-                .padding(.top, 20)
-                .padding(.bottom, 30)
+                .padding(.trailing, 10)
 
-                VStack(alignment: .leading, spacing: 10) {
-                    SidebarButton(title: "Time", icon: "clock", isSelected: currentTab == .timer) {
+                HStack(spacing: 12) {
+                    TabButton(title: "Time", icon: "clock", isSelected: currentTab == .timer) {
                         currentTab = .timer
                     }
-                    SidebarButton(title: "Dashboard", icon: "square.grid.2x2", isSelected: currentTab == .dashboard) {
+                    TabButton(title: "Dashboard", icon: "square.grid.2x2", isSelected: currentTab == .dashboard) {
                         currentTab = .dashboard
                     }
-                    SidebarButton(title: "Projects", icon: "folder", isSelected: currentTab == .projects) {
+                    TabButton(title: "Projects", icon: "folder", isSelected: currentTab == .projects) {
                         currentTab = .projects
                     }
                 }
+                
                 Spacer()
                 
-                Button("Quit") {
+                Button(action: {
                     NSApplication.shared.terminate(nil)
+                }) {
+                    Image(systemName: "power")
+                        .foregroundColor(.secondary)
                 }
                 .buttonStyle(.plain)
-                .padding()
-                .foregroundColor(.secondary)
+                .help("Quit HarvestClone")
             }
-            .frame(width: 180)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
             .background(Color(NSColor.windowBackgroundColor))
             
             Divider()
@@ -65,7 +69,7 @@ struct ContentView: View {
     }
 }
 
-struct SidebarButton: View {
+struct TabButton: View {
     let title: String
     let icon: String
     let isSelected: Bool
@@ -73,19 +77,18 @@ struct SidebarButton: View {
     
     var body: some View {
         Button(action: action) {
-            HStack {
+            HStack(spacing: 6) {
                 Image(systemName: icon)
-                    .frame(width: 20)
+                    .font(.system(size: 14))
                 Text(title)
-                Spacer()
+                    .font(.system(size: 13, weight: isSelected ? .medium : .regular))
             }
-            .padding(.vertical, 8)
-            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 10)
             .background(isSelected ? Color.accentColor.opacity(0.15) : Color.clear)
             .foregroundColor(isSelected ? .accentColor : .primary)
-            .cornerRadius(8)
+            .cornerRadius(6)
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 10)
     }
 }

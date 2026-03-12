@@ -574,3 +574,47 @@ When the user hits "Stop":
 
 ## Validation Results
 - Validated local `xcodebuild` successfully. UI mapping bindings dynamically adjust explicitly without conflict errors.
+
+<a name="log-20260311-horizontal-tabs"></a>
+## Request
+> Time dashboard and projects should be horizontal tab selectors at the top of the window instead of in the sidebar because it uses a lot of real estate for nothing. 
+
+## Artifact: Implementation Plan
+# Implement Horizontal Tab Navigation
+
+The user wants to reclaim horizontal screen real estate by moving the left sidebar into a top horizontal navigation bar, similar to standard website headers or horizontal toolbar layouts.
+
+## Approach
+
+Currently, `HarvestCloneMac/Sources/Views/ContentView.swift` uses an `HStack` containing a 180px fixed-width `VStack` (the sidebar) and the main content view.
+
+We will restructure this by:
+1. Changing the root `HStack` to a `VStack`.
+2. Building a top navigation header (`HStack`) containing:
+   - App Logo & Title "HarvestClone" on the left.
+   - The Tab selectors ("Time", "Dashboard", "Projects") in the center or immediately following.
+   - The "Quit" button on the far right.
+3. Updating the internal `SidebarButton` struct to `TabButton`, tweaking padding and alignment rules to fit horizontally without `Spacer()` expansion meant for vertical menus.
+4. Keeping the `switched` content views rendering exactly as they do below a `Divider()`.
+
+## Proposed Changes
+
+### `HarvestCloneMac/Sources/Views/ContentView.swift`
+#### [MODIFY] ContentView.swift
+- Change root `HStack` to a `VStack(spacing: 0)`.
+- Replace the 180px width sidebar `VStack` with a flexible-width `HStack` with `.padding()`.
+- Move the logo, Tab Buttons, and Quit Button into this top header.
+- Rename `SidebarButton` -> `TabButton`.
+- Remove the internal `Spacer()` inside `TabButton` (used to push items to the left in the sidebar), making the buttons inherently compact.
+
+## Artifact: Walkthrough
+# Walkthrough: Horizontal Navigation Strip
+
+## Changes Made
+- **ContentView.swift**: 
+  - Restructured the root body wrapping moving from a left-anchored `HStack` splitting the window rendering space to a stackably vertical `VStack`.
+  - Built out a horizontal Header bar containing the branding logos, the core navigation tabs grouping, and the app Power/Quit symbol floated via a `Spacer()`.
+  - Converted the old vertically-spanning `SidebarButton` object natively inside the same file into a more compact `TabButton`, reducing default padding footprints and dropping out internal layout `Spacers` so buttons compress elegantly together. 
+
+## Validation Results
+- Tested via `xcodebuild` seamlessly. The layout is significantly cleaner and reclaims all 180px of width for the actual tracking descriptions/time logs underneath.
