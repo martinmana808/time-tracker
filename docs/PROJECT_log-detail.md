@@ -670,3 +670,46 @@ Drop the `.overlay` mapping blocks generating the form views, shift them inside 
 
 ## Validation Results
 - Tested natively via `xcodebuild` parsing. Visual overlays map natively, shadows drop correctly underneath, and bounding logic highlights successfully.
+
+<a name="log-20260313-record-layout"></a>
+## Request
+> The record row should be:
+> - Project (no text wrap. if anything ellipsis ...)
+> - Description (no text wrap, if anything ellipsis ...) 
+> - Time
+> - Edit
+> - Play (pause if its active). 
+
+## Artifact: Implementation Plan
+# Update Time Record Row Layout
+
+The user requested a specific layout for the time record row in the "Recent Entries" list, to better align with the desired UI and remove unnecessary wrapping.
+
+## Approach
+Currently, in `TimerView.swift`, the left side of the row is wrapped in a large `Button` that triggers the edit modal.
+We will flatten this into a single sequential `HStack`: 
+
+1. **Project**: Truncated with ellipsis (`.lineLimit(1)`, `.truncationMode(.tail)`).
+2. **Description**: Truncated with ellipsis (`.lineLimit(1)`, `.truncationMode(.tail)`).
+3. **Space**
+4. **Time String** 
+5. **Edit Button** (standalone)
+6. **Play/Pause/Stop Buttons**
+
+## Proposed Changes
+
+### `HarvestCloneMac/Sources/Views/TimerView.swift`
+#### [MODIFY] TimerView.swift
+- Rewrite the `HStack` inside `ForEach(store.timeEntries)`.
+- Flatten the row layout.
+- Apply `.lineLimit(1)` and `.truncationMode(.tail)` to both Project Name and Description texts.
+- Add an explicit `Button(action: { entryToEdit = entry })` with a `pencil` icon.
+
+## Artifact: Walkthrough
+# Walkthrough: Restructured Time Record Layout
+
+## Changes Made
+- **TimerView.swift**: Dropped the outer `Button` layer wrapped around the left side arrays. Explicitly re-declared `HStack` items tracking Project formatting and Description applying `lineLimit(1)` bounding. Removed `entry.date` mappings reducing horizontal load. Re-placed `pencil` Edit icon natively alongside the play/pause/stop mechanics.
+
+## Validation Results
+- Tested natively via `xcodebuild` seamlessly. Visual bounds conform to tight truncation logic matching single-line lists flawlessly.

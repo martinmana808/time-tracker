@@ -106,30 +106,27 @@ struct TimerView: View {
                                 ForEach(store.timeEntries) { entry in
                                     if let project = store.getProject(id: entry.projectId) {
                                         HStack {
-                                            Button(action: {
-                                                entryToEdit = entry
-                                            }) {
-                                                HStack {
-                                                    Circle()
-                                                        .fill(Color(hex: project.color) ?? .blue)
-                                                        .frame(width: 10, height: 10)
-                                                    
-                                                    Text(project.name)
-                                                        .font(.subheadline)
-                                                        .frame(width: 100, alignment: .leading)
-                                                    
-                                                    Text(entry.description.isEmpty ? "No description" : entry.description)
-                                                        .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
-                                                    
-                                                    Spacer()
-                                                    
-                                                    Text(entry.date, style: .date)
-                                                        .font(.subheadline)
-                                                        .foregroundColor(.secondary)
-                                                        .padding(.trailing, 8)
-                                                }
+                                            // Project
+                                            HStack(spacing: 6) {
+                                                Circle()
+                                                    .fill(Color(hex: project.color) ?? .blue)
+                                                    .frame(width: 10, height: 10)
+                                                
+                                                Text(project.name)
+                                                    .font(.subheadline)
+                                                    .lineLimit(1)
+                                                    .truncationMode(.tail)
                                             }
-                                            .buttonStyle(.plain)
+                                            .frame(width: 140, alignment: .leading)
+                                            
+                                            // Description
+                                            Text(entry.description.isEmpty ? "No description" : entry.description)
+                                                .font(.subheadline)
+                                                .foregroundColor(entry.description.isEmpty ? .secondary : .primary)
+                                                .lineLimit(1)
+                                                .truncationMode(.tail)
+                                            
+                                            Spacer()
                                             
                                             // Conditional Right Aligned UI 
                                             if store.activeTimer?.entryId == entry.id {
@@ -137,6 +134,15 @@ struct TimerView: View {
                                                 Text(store.activeTimeString)
                                                     .font(.system(.body, design: .monospaced))
                                                     .foregroundColor(.blue) // Highlight it so user knows it's mutating
+                                                
+                                                Button(action: {
+                                                    entryToEdit = entry
+                                                }) {
+                                                    Image(systemName: "pencil")
+                                                        .foregroundColor(.secondary)
+                                                        .padding(.leading, 8)
+                                                }
+                                                .buttonStyle(.plain)
                                                 
                                                 Button(action: {
                                                     if store.activeTimer?.startTime != nil {
@@ -147,7 +153,7 @@ struct TimerView: View {
                                                 }) {
                                                     Image(systemName: store.activeTimer?.startTime != nil ? "pause.fill" : "play.fill")
                                                         .foregroundColor(.orange)
-                                                        .padding(.leading, 8)
+                                                        .padding(.leading, 4)
                                                 }
                                                 .buttonStyle(.plain)
                                                 
@@ -164,6 +170,15 @@ struct TimerView: View {
                                                 // Default historical data display
                                                 Text(timeString(from: entry.endTime.timeIntervalSince(entry.startTime)))
                                                     .font(.system(.body, design: .monospaced))
+                                                
+                                                Button(action: {
+                                                    entryToEdit = entry
+                                                }) {
+                                                    Image(systemName: "pencil")
+                                                        .foregroundColor(.secondary)
+                                                        .padding(.leading, 8)
+                                                }
+                                                .buttonStyle(.plain)
                                             
                                                 Button(action: {
                                                     store.resumeTimeEntry(entry)
@@ -172,7 +187,7 @@ struct TimerView: View {
                                                 }) {
                                                     Image(systemName: "play.fill")
                                                         .foregroundColor(.blue)
-                                                        .padding(.leading, 8)
+                                                        .padding(.leading, 4)
                                                 }
                                                 .buttonStyle(.plain)
                                             }

@@ -7,6 +7,10 @@ A local-first stopwatch and timer application cloning Harvest functionality. Re-
 
 ## History
 
+### [2026-03-13] Restructured Time Record Layout | [Technical Details](./PROJECT_log-detail.md#log-20260313-record-layout)
+- Removed date explicitly overriding old format per list.
+- Re-architected `TimerView.swift` tracking array `HStack` flattening components into: Project (Truncated), Description (Truncated), Time String, Direct Edit Action, & Play/Pause.
+
 ### [2026-03-11] UI Polish: Hit Zones, Highlights & Layouts | [Technical Details](./PROJECT_log-detail.md#log-20260311-ui-polish)
 - Added `.contentShape(Rectangle())` to `TabButton` fixing native macOS SwiftUI padding zones dropping user pointer clicks. 
 - Injected dynamic background tint and colored border overlays explicitly targeting the active inline tracking row bringing visual prominence to live entries.
